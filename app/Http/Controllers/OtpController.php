@@ -17,7 +17,7 @@ class OtpController extends Controller
         ]);
 
         $otpCode = rand(100000, 999999); 
-        $expiresAt = Carbon::now()->addSeconds(5); 
+        $expiresAt = Carbon::now()->addSeconds(30); 
 
         Otp::updateOrCreate(
             ['email' => $request->email],

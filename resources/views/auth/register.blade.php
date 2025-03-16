@@ -10,23 +10,34 @@
     <div class="bg-white shadow-md rounded-lg flex w-full max-w-4xl">
         <div class="w-full md:w-2/5 p-8 my-auto justify-center">
             <h2 class="text-3xl font-bold mb-8">Register</h2>
-            <form method="POST" action="/send-otp" class="mb-16">
-                @csrf
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
-                    <input class="w-full py-2 border-b border-black focus:outline-none focus:border-blue-500" name="email" id="email" type="email" required/>
-                </div>
                 @if(session('success'))
                     <div id="notif" class="my-4 p-3 text-sm text-black bg-green-300 rounded-sm text-center">
                         {{ session('success') }}
                     </div>
                 @endif
+
+                @if(session('error'))
+                    <div id="notif" class="my-4 p-3 text-sm text-black bg-red-300 rounded-sm text-center">
+                        {{ session('error') }}
+                    </div>
+                @endif
+            <form id="email-form" method="POST" action="/send-otp" class="mb-16">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                    <input class="w-full py-2 border-b border-black focus:outline-none focus:border-blue-500" name="email" id="email" type="email" required/>
+                </div>
                 <div class="mb-4">
                     <button class="w-full bg-black text-white py-2 rounded" type="submit">Send OTP</button>
                 </div>
             </form>
-            <form action="#">
+            <form id="otp-form" method="POST" action="/verify-otp" style="display: none;">
                 @csrf
+                @if(session('success'))
+                    <div id="notif" class="my-4 p-3 text-sm text-black bg-green-300 rounded-sm text-center">
+                        {{ session('success') }}
+                    </div>
+                @endif
                 <div class="flex justify-center space-x-2 mb-8">
                     <input type="text" name="otp[]" maxlength="1" class="otp-input w-10 h-10 text-center border-2 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-semibold">
                     <input type="text" name="otp[]" maxlength="1" class="otp-input w-10 h-10 text-center border-2 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-semibold">
@@ -45,24 +56,61 @@
         </div>
     </div>
     <script>
-        // Automatically move focus to next box when a digit is entered
-        document.querySelectorAll('.otp-input').forEach((input, index, elements) => {
-            input.addEventListener('input', (event) => {
-                if (event.target.value.length === 1) {
-                    if (index < elements.length - 1) {
-                        elements[index + 1].focus();
+        document.addEventListener("DOMContentLoaded", () => {
+        const emailForm = document.getElementById("email-form");
+        const otpForm = document.getElementById("otp-form");
+
+        emailForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            // Get form data
+            const formData = new FormData(emailForm);
+
+            try {
+                let response = await fetch(emailForm.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
                     }
+                });
+
+                let result;
+                try {
+                    result = await response.json(); 
+                } catch (jsonError) {
+                    result = { message: "OTP sent, but an unexpected response was received." };
+                }
+
+                if (response.ok) {
+                    emailForm.style.display = "none";
+                    otpForm.style.display = "block";
+                } else {
+                    alert(result.message || "Failed to send OTP.");
+                }
+            } catch (error) {
+                console.error("Error sending OTP:", error);
+                alert("Something went wrong. Please try again.");
+            }
+        });
+
+        // OTP input auto-focus
+        document.querySelectorAll(".otp-input").forEach((input, index, elements) => {
+            input.addEventListener("input", (event) => {
+                if (event.target.value.length === 1 && index < elements.length - 1) {
+                    elements[index + 1].focus();
                 }
             });
 
-            input.addEventListener('keydown', (event) => {
-                if (event.key === "Backspace" && event.target.value.length === 0) {
-                    if (index > 0) {
-                        elements[index - 1].focus();
-                    }
+            input.addEventListener("keydown", (event) => {
+                if (event.key === "Backspace" && event.target.value.length === 0 && index > 0) {
+                    elements[index - 1].focus();
                 }
             });
         });
+    });
+
     </script>
+
 </body>
 </html>

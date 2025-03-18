@@ -7,6 +7,7 @@ use App\Models\Otp;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Mail\OtpMail;
+use App\Http\Middleware\CheckSession;
 
 class OtpController extends Controller
 {
@@ -25,19 +26,21 @@ class OtpController extends Controller
         );
 
         session(['otp_email' => $request->email]);
-
-        // Send OTP via email
         Mail::to($request->email)->send(new OtpMail($otpCode));
-        session()->flash('success', 'OTP has been sent to your email.');
 
-        return back();
+        return redirect()->route('register.otp.form');
+    }
+
+    public function showOtpForm()
+    {
+        return view('auth.otp-form');
     }
 
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp' => 'required|array', // Ensure it's an array
-            'otp.*' => 'digits:1' // Each OTP input must be a single digit
+            'otp' => 'required|array', 
+            'otp.*' => 'digits:1' 
         ]);
 
         // Convert array to a single OTP string
@@ -65,7 +68,7 @@ class OtpController extends Controller
             return back();
         }
 
-        // OTP is valid, proceed to next step
+        session(['user_email' => $email]);
         session()->flash('success', 'OTP verified successfully.');
 
         // Remove OTP from database and session after successful verification

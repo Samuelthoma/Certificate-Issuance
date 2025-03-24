@@ -1,10 +1,22 @@
+absl-py
+attrs
+flatbuffers
+jax
+jaxlib
+opencv-contrib-python
+protobuf<5
+sentencepiece
+sounddevice
 cycler
 kiwisolver
 matplotlib
-numpy
+numpy<2  # Ensure compatibility with MediaPipe
 opencv-python
+mediapipe
 Pillow
 pyparsing
 pytesseract
 python-dateutil
 six
+ml-dtypes
+opt-einsum

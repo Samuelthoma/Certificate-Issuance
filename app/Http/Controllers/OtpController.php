@@ -74,7 +74,8 @@ class OtpController extends Controller
         // Remove OTP from database and session after successful verification
         $otpRecord->delete();
         session()->forget('otp_email');
-        return back();
+        return redirect()->route('ocr.form');
+
     }
 }
 

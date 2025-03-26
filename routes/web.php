@@ -22,3 +22,8 @@ Route::get('/data-verification', [NikVerificationController::class, 'showOcrForm
 Route::get('/welcome', function () {
     return view('pages.home');
 });
+
+
+Route::get('/face-verification', function () {
+    return view('auth.face-verification'); 
+})->name('face-verification');

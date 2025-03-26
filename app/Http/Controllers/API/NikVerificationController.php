@@ -60,28 +60,4 @@ class NikVerificationController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Error processing the image', 'error' => $e->getMessage()], 500);
         }
     }
-
-    public function verifyNik(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nik' => 'required|string|size:16',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid NIK format', 'errors' => $validator->errors()], 422);
-        }
-
-        $nik = $request->input('nik');
-        
-        try {
-            $exists = NikVerification::verifyNik($nik);
-            return response()->json([
-                'status' => $exists ? 'success' : 'fail',
-                'message' => $exists ? 'NIK is valid' : 'NIK is not found',
-                'data' => ['nik' => $nik, 'exists' => $exists]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Verification service unavailable', 'error' => $e->getMessage()], 500);
-        }
-    }
 }

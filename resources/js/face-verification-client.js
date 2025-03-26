@@ -284,13 +284,15 @@ window.FaceVerificationClient = class FaceVerificationClient {
       }
     }
   
-    // Handle errors
+  // Handle errors and refresh page
     handleError(message) {
       console.error(message);
-      if (this.onError) {
-        this.onError(message);
-      }
+      alert(message); 
+      setTimeout(() => {
+        location.reload(); 
+      }, 1500);
     }
+
   }
   
   // Export for use in modules

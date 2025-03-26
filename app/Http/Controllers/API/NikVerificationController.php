@@ -14,6 +14,14 @@ class NikVerificationController extends Controller
 {
     protected $ocrService;
 
+    public function showIdForm(){
+        return view('auth.id-form');
+    }
+
+    public function showOcrForm(){
+        return view('auth.ocr-form');
+    }
+
     public function __construct(OcrService $ocrService)
     {
         $this->ocrService = $ocrService;

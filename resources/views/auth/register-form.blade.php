@@ -13,7 +13,7 @@
             @csrf
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="phoneNumber">Username : </label>
-                    <input class="w-full py-2 border-b border-black focus:outline-none focus:border-blue-500" name="username" id="username" type="username" required/>
+                    <input class="w-full py-2 border-b border-black focus:outline-none focus:border-blue-500" name="username" id="username" type="text" required/>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password : </label>

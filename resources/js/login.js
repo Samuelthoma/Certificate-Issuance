@@ -17,9 +17,23 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
             sessionStorage.setItem("token", data.token);
             window.location.href = "/dashboard";
         } else {
-            alert(data.error || "Login failed");
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                text: 'Invalid Email or Password',
+                showConfirmButton: false,
+                timer: 3000,
+            })
         }
     } catch (error) {
-        alert("Something went wrong, please try again.");
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            text: 'Error, Please Try Again',
+            showConfirmButton: false,
+            timer: 3000,
+        })
     }
 });

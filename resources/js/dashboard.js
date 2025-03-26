@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
 
         let data = await response.json();
-        document.getElementById("user-email").innerText = data.user.email;
+        document.getElementById("user-email").innerText = data.user.name;
     } catch (error) {
         sessionStorage.removeItem("token");
         window.location.href = "/login";

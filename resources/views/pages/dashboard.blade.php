@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/js/dashboard.js'])
 </head>
     
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="w-1/4 bg-white p-6">
+        <div class="w-64 bg-white p-6 fixed h-full md:relative md:w-1/4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar">
             <div class="flex items-center mb-8">
                 <img alt="Clarisign logo" height="60" src="{{ asset('images/logo.png') }}" width="60"/>
                 <span class="text-xl font-bold">
                     Clarisign
                 </span>
             </div>
+            <button class="md:hidden text-gray-500" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
             <p class="text-sm font-semibold mb-6">
                 Your Trusted Partner in Digital Identity Verification
             </p>
@@ -63,18 +66,23 @@
                     <i class="fas fa-file-alt mr-2"></i>
                     Reports
                 </a>
-                <button id="logoutButton" class="px-4 py-1 w-full bg-red-500 text-white rounded-sm hover:bg-red-600 transition">Log Out</button>
+                <a id="logoutButton" class="flex items-center text-red-500">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Log Out
+                </a>
             </nav>
         </div>
         <!-- Main Content -->
         <div class="flex-1 p-6">
             <div class="flex justify-between items-center mb-8">
+                <button class="md:hidden text-gray-500" onclick="toggleSidebar()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
                 <div>
                     <p class="text-sm text-gray-500">
                         Welcome back,
                     </p>
                     <h1 class="text-2xl" id="user-email">
-                        Loading...
                     </h1>
                     <p class="text-sm text-gray-500">
                         Glad to see you again!
@@ -144,6 +152,10 @@
             </div>
         </div>
     </div>
-    @vite('resources/js/dashboard.js')
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+    </script>
 </body>
 </html>

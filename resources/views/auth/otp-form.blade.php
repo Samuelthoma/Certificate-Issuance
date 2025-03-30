@@ -11,7 +11,7 @@
                     
         <form id="otp-form" method="POST" action="/verify-otp">
             @csrf   
-            <div class="font-bold my-4">OTP Has been Sent to <span class="text-blue-400">{{ session('otp_email') }}</span></div>
+            <div class="font-bold my-4">OTP Has been Sent to <span class="text-blue-400">{{ session('registration_data')['email'] }}</span></div>
             @for ($i = 0; $i < 6; $i++)
                 <input type="text" name="otp[]" maxlength="1" 
                     class="otp-input w-10 h-10 text-center border-2 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-xl font-semibold">
@@ -24,7 +24,7 @@
             <form action="/send-otp" method="POST">
                 <p>Didn't receive the OTP?</p>
                 @csrf
-                <input type="hidden" name="email" value="{{ session('otp_email') }}">
+                <input type="hidden" name="email" value="{{ session('registration_data')['email'] ?? '' }}">
                 <button type="submit" class="text-blue-500 font-bold border-none bg-transparent cursor-pointer">
                     Resend OTP
                 </button>

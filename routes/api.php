@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\API\FaceVerificationController;
 
-Route::post('/verify-nik', [NikVerificationController::class, 'verify']);
-Route::post('/extract-nik', [NikVerificationController::class, 'extractNikFromImage']);
+Route::post('/verify-nik', [NikVerificationController::class, 'verifyNik']); 
+Route::post('/extract-nik', [NikVerificationController::class, 'extractNik']);
 
 Route::prefix('face-verification')->group(function () {
     Route::post('/start', [FaceVerificationController::class, 'startSession']);

@@ -16,13 +16,7 @@ Route::get('/otp', [OtpController::class, 'showOtpForm'])->name('register.otp.fo
 Route::post('/verify-otp', [OtpController::class, 'verifyOtp']);
 
 Route::get('/id-validation', [NikVerificationController::class, 'showIdForm'])->name('id.validation');
-
 Route::get('/data-verification', [NikVerificationController::class, 'showOcrForm'])->name('id.validation');
-
-Route::get('/welcome', function () {
-    return view('pages.home');
-});
-
 
 Route::get('/face-verification', function () {
     return view('auth.face-verification'); 

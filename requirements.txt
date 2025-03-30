@@ -20,3 +20,7 @@ python-dateutil
 six
 ml-dtypes
 opt-einsum
+easyocr
+torch 
+torchvision 
+torchaudio

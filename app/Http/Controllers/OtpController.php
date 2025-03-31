@@ -101,7 +101,7 @@ class OtpController extends Controller
         $otpRecord->delete();
     
         session()->flash('success', 'OTP verified successfully.');
-        return redirect()->route('id.validation');
+        return redirect()->route('ocr.file');
     }
     
 }

@@ -41,14 +41,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (response.ok && result.success) {
                     // Show success message
                     alert("KTP data extracted successfully!");
-                    
-                    // Check if there's a redirect URL in the response
-                    if (result.redirect) {
-                        window.location.href = result.redirect;
-                    } else {
-                        // If no redirect URL is provided, use the hardcoded path
-                        window.location.href = "/data-verification";
+
+                    function convertDateFormat(dateStr) {
+                        if (dateStr.includes("-")) {
+                            let parts = dateStr.split("-"); // Split "18-01-1987" into ["18", "01", "1987"]
+                            return `${parts[2]}-${parts[1]}-${parts[0]}`; // Rearrange to "yyyy-MM-dd"
+                        }
+                        return dateStr; // Return unchanged if format is invalid
                     }
+                    sessionStorage.setItem("ocr_nik", result.nik);
+                    sessionStorage.setItem("ocr_name", result.name);
+                    sessionStorage.setItem("ocr_dob", convertDateFormat(result.dob));
+                    window.location.href = result.redirect || "/ocr-form";
                 } else {
                     alert("Error: " + (result.message || "Failed to process image"));
                 }
@@ -129,4 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         nikVerifyButton.addEventListener("click", verifyNik);
     }
+
+    document.getElementById("nikInput").value = sessionStorage.getItem("ocr_nik");
+    document.getElementById("nameInput").value = sessionStorage.getItem("ocr_name");
+    document.getElementById("dobInput").value = sessionStorage.getItem("ocr_dob");
 });

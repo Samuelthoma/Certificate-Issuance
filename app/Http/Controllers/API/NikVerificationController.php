@@ -13,17 +13,13 @@ class NikVerificationController extends Controller
 {
 
 
-    public function showIdForm(){
-        return view('auth.id-form');
+    public function showOcrFileSubmission(){
+        return view('auth.ocr-file-submission');
     }
 
     public function showOcrForm()
     {
-        return view('auth.ocr-form', [
-            'nik' => session('ocr_nik'),
-            'name' => session('ocr_name'),
-            'dob' => session('ocr_dob')
-        ]);
+        return view('auth.ocr-form-submission');
     }
     
 
@@ -46,12 +42,11 @@ class NikVerificationController extends Controller
                 'errors' => $e->errors(),
             ], 422);
         }
-    
+
         try {
-            // Send the image to Flask API
             $imagePath = $request->file('id_card_image')->getPathname();
             $imageName = $request->file('id_card_image')->getClientOriginalName();
-    
+
             $client = new \GuzzleHttp\Client();
             $response = $client->post('http://127.0.0.1:5001/extract-ktp', [
                 'multipart' => [
@@ -62,10 +57,9 @@ class NikVerificationController extends Controller
                     ],
                 ],
             ]);
-    
+
             $responseData = json_decode($response->getBody(), true);
-    
-            // Check if data key exists and has required fields
+
             if (!isset($responseData['data']) || 
                 !isset($responseData['data']['NIK'], 
                     $responseData['data']['Nama'], 
@@ -73,17 +67,13 @@ class NikVerificationController extends Controller
                 throw new \Exception("Invalid response format from Flask API");
             }
 
-            // Store extracted data in session
-            session([
-                'ocr_nik' => $responseData['data']['NIK'],
-                'ocr_name' => $responseData['data']['Nama'],
-                'ocr_dob' => $responseData['data']['Tanggal Lahir']
-            ]);
-            
             return response()->json([
                 'success' => true,
                 'message' => 'KTP data extracted successfully',
-                'redirect' => route('id.validation') // Redirect to the verification page
+                'nik' => $responseData['data']['NIK'],
+                'name' => $responseData['data']['Nama'],
+                'dob' => $responseData['data']['Tanggal Lahir'],
+                'redirect' => route('ocr.form') // Redirect to verification page
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -93,6 +83,7 @@ class NikVerificationController extends Controller
             ], 500);
         }
     }
+
     
 
     public function verifyNik(Request $request)

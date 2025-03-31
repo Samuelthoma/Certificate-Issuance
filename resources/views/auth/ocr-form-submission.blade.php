@@ -16,8 +16,7 @@
                     required 
                     maxlength="16" 
                     pattern="\d{16}"
-                    title="NIK must be exactly 16 digits"
-                    value="{{ $nik }}" />
+                    title="NIK must be exactly 16 digits"/>
         </div>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name : </label>
@@ -25,8 +24,7 @@
                     name="name" 
                     id="nameInput" 
                     type="text" 
-                    required
-                    value="{{ $name }}" />
+                    required/>
         </div>
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">Date of Birth : </label>
@@ -34,8 +32,7 @@
                     name="dob" 
                     id="dobInput" 
                     type="date" 
-                    required
-                    value="{{ $dob }}" />
+                    required/>
         </div>
         <div id="errorMessage" class="text-red-500 mb-4 hidden"></div>
         <div class="my-5">

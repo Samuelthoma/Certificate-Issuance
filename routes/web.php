@@ -15,8 +15,8 @@ Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('send.otp');
 Route::get('/otp', [OtpController::class, 'showOtpForm'])->name('register.otp.form')->Middleware('session:otp');
 Route::post('/verify-otp', [OtpController::class, 'verifyOtp']);
 
-Route::get('/id-validation', [NikVerificationController::class, 'showIdForm'])->name('id.validation');
-Route::get('/data-verification', [NikVerificationController::class, 'showOcrForm'])->name('id.validation');
+Route::get('/ocr-file', [NikVerificationController::class, 'showOcrFileSubmission'])->name('ocr.file');
+Route::get('/ocr-form', [NikVerificationController::class, 'showOcrForm'])->name('ocr.form');
 
 Route::get('/face-verification', function () {
     return view('auth.face-verification'); 

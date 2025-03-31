@@ -22,13 +22,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById("submitButton");
     if (submitButton) {
         submitButton.addEventListener("click", async function () {
-            if (!fileInput.files.length) {
+            if (!fileInput || !fileInput.files.length) {
                 alert("Please select an image first.");
                 return;
             }
 
             const formData = new FormData();
-            formData.append("id_card", fileInput.files[0]); // Ensure field name matches API
+            formData.append("id_card_image", fileInput.files[0]); // Ensure field name matches API
 
             try {
                 const response = await fetch("/api/extract-nik", {
@@ -38,17 +38,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const result = await response.json();
 
-                if (response.ok) {
-                    const accuracy = result?.data?.nik_accuracy; // Extract accuracy from response
-
-                    if (accuracy === "low") {
-                        alert("The extracted NIK accuracy is low. Please upload a clearer image.");
-                    } else if (accuracy === "high") {
-                        alert("NIK extracted successfully: " + result.data.nik);
-                        window.location.href = "/data-verification"; // Redirect if accuracy is high
+                if (response.ok && result.success) {
+                    // Show success message
+                    alert("KTP data extracted successfully!");
+                    
+                    // Check if there's a redirect URL in the response
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
+                        // If no redirect URL is provided, use the hardcoded path
+                        window.location.href = "/data-verification";
                     }
                 } else {
-                    alert("Error: " + result.message);
+                    alert("Error: " + (result.message || "Failed to process image"));
                 }
             } catch (error) {
                 console.error("Error:", error);
@@ -57,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-        // **Handle NIK Verification (Only If NIK Input Exists)**
+    // **Handle NIK Verification (Only If NIK Input Exists)**
     const nikInput = document.getElementById("nikInput");
     const nikVerifyButton = document.getElementById("nikVerifyButton");
 

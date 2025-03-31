@@ -20,9 +20,9 @@ class NikVerificationController extends Controller
     public function showOcrForm()
     {
         return view('auth.ocr-form', [
-            'nik' => session('ocr_nik', ''),
-            'name' => session('ocr_name', ''),
-            'dob' => session('ocr_dob', '')
+            'nik' => session('ocr_nik'),
+            'name' => session('ocr_name'),
+            'dob' => session('ocr_dob')
         ]);
     }
     
@@ -95,9 +95,6 @@ class NikVerificationController extends Controller
     }
     
 
-
-
-    
     public function verifyNik(Request $request)
     {
         $validator = Validator::make($request->all(), [

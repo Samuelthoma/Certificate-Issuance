@@ -23,7 +23,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (submitButton) {
         submitButton.addEventListener("click", async function () {
             if (!fileInput || !fileInput.files.length) {
-                alert("Please select an image first.");
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    text: 'Please upload an image of your KTP',
+                    showConfirmButton: false,
+                    timer: 3000,
+                })
                 return;
             }
 
@@ -40,7 +47,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (response.ok && result.success) {
                     // Show success message
-                    alert("KTP data extracted successfully!");
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        text: 'KTP Data Extracted Successfully!',
+                        showConfirmButton: false,
+                        timer: 4000,
+                        timerProgressBar: true,
+                    }).then(() =>{
+                        window.location.href = "/ocr-form";
+                    })
 
                     function convertDateFormat(dateStr) {
                         if (dateStr.includes("-")) {
@@ -52,13 +69,26 @@ document.addEventListener("DOMContentLoaded", function () {
                     sessionStorage.setItem("ocr_nik", result.nik);
                     sessionStorage.setItem("ocr_name", result.name);
                     sessionStorage.setItem("ocr_dob", convertDateFormat(result.dob));
-                    window.location.href = result.redirect || "/ocr-form";
                 } else {
-                    alert("Error: " + (result.message || "Failed to process image"));
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        text: 'Failed to extract KTP data. Please try again.',
+                        showConfirmButton: false,
+                        timer: 3000,
+                    })
                 }
             } catch (error) {
                 console.error("Error:", error);
-                alert("An error occurred while processing the image.");
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    text: 'An error occurred while processing your request.',
+                    showConfirmButton: false,
+                    timer: 3000,
+                })
             }
         });
     }

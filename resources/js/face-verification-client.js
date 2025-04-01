@@ -285,13 +285,13 @@ window.FaceVerificationClient = class FaceVerificationClient {
     }
   
   // Handle errors and refresh page
-    handleError(message) {
-      console.error(message);
-      alert(message); 
-      setTimeout(() => {
-        location.reload(); 
-      }, 1500);
-    }
+    // handleError(message) {
+    //   console.error(message);
+    //   alert(message); 
+    //   setTimeout(() => {
+    //     location.reload(); 
+    //   }, 1500);
+    // }
 
   }
   

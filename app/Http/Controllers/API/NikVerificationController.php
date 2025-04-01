@@ -129,7 +129,7 @@ class NikVerificationController extends Controller
             
             return response()->json([
                 'status' => $exists ? 'success' : 'fail',
-                'message' => $exists ? 'NIK is valid' : 'NIK is not found',
+                'message' => $exists ? 'NIK is valid' : 'Your Data is Not Found in Dukcapil Database',
                 'data' => ['nik' => $nik, 'exists' => $exists]
             ], 200);
         } catch (\Exception $e) {

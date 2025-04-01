@@ -5,16 +5,16 @@
 @vite('resources/js/face-verification-client.js')
 
 <div class="container text-center">
-    <h2>Face Verification</h2>
-    <p id="status">Click the button below to start verification.</p>
+    <h2 class="text-3xl font-bold mb-8">Face Verification</h2>
+    <p class="font-bold mb-3" id="status">Click the button below to start verification.</p>
     
     <div class="video-container">
-        <video id="video" autoplay></video>
+        <video id="video" autoplay class="w-full h-full rounded-md"></video>
         <canvas id="canvas" style="display: none;"></canvas>
     </div>
     
-    <button id="startBtn" class="btn btn-primary mt-3">Start Verification</button>
-    <button id="captureBtn" class="btn btn-success mt-3 ms-2" style="display: none;">Capture</button>
+    <button id="startBtn"class="my-3 w-full bg-black text-white py-2 rounded">Start Verification</button>
+    <button id="captureBtn" class="w-full bg-black text-white py-2 rounded" style="display: none;">Capture</button>
 </div>
 
 <script type="module">

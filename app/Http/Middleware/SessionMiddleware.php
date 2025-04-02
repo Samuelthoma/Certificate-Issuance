@@ -15,7 +15,7 @@ class SessionMiddleware
      */
     public function handle(Request $request, Closure $next, $type = null): Response
     {
-        if ($type === 'otp' && !$request->session()->has('otp_email')) {
+        if ($type === 'otp' && !session('registration_data') || !session('registration_data')['email']) {
             return redirect()->route('register')->with('error', 'Please fill in your data first.');
         }
 

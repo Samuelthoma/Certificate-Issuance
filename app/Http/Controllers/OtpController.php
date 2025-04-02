@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Mail\OtpMail;
 use App\Http\Middleware\CheckSession;
+use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
 {
@@ -56,6 +57,7 @@ class OtpController extends Controller
 
     public function showOtpForm()
     {
+        Log::info('After:', session()->all());
         return view('auth.otp-form');
     }
 
@@ -94,8 +96,7 @@ class OtpController extends Controller
         }
     
         // Update session to indicate step 3
-        $registrationData['step'] = 3;
-        session(['registration_data' => $registrationData]);
+        session(['registration_step' => 3]);
     
         // Remove OTP from database and session after successful verification
         $otpRecord->delete();

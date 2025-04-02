@@ -446,11 +446,29 @@ class FaceVerificationController extends Controller
      * Clean up all files associated with a verification session
      * 
      * @param string $sessionId
+     * @param bool $checkForSuccessToken Whether to check if the session has a valid token before deletion
      * @return bool
      */
-    private function cleanupSessionFiles(string $sessionId)
+    private function cleanupSessionFiles(string $sessionId, bool $checkForSuccessToken = true)
     {
         try {
+            // Check if we need to protect successful verifications
+            if ($checkForSuccessToken) {
+                $session = VerificationSession::where('session_id', $sessionId)
+                    ->where('verified', true)
+                    ->where('verification_token', '!=', null)
+                    ->first();
+                
+                // If this is a successful verification with a token, don't clean up
+                if ($session) {
+                    Log::info("Skipping cleanup for successful verification: {$sessionId}");
+                    return true;
+                }
+            }
+            
+            // Now also clean up the database entry
+            $this->cleanupDatabaseEntry($sessionId);
+            
             // Define the session directory path
             $sessionDir = storage_path('app' . DIRECTORY_SEPARATOR . 'face_verification' . DIRECTORY_SEPARATOR . $sessionId);
             
@@ -474,5 +492,65 @@ class FaceVerificationController extends Controller
         }
     }
 
+    /**
+     * Clean up database entry for a verification session
+     * 
+     * @param string $sessionId
+     * @return bool
+     */
+    private function cleanupDatabaseEntry(string $sessionId)
+    {
+        try {
+            // Check if there's a successful verification that shouldn't be deleted
+            $session = VerificationSession::where('session_id', $sessionId)
+                ->where('verified', true)
+                ->where('verification_token', '!=', null)
+                ->first();
+            
+            // If this is a successful verification with a token, don't delete the database entry
+            if ($session) {
+                Log::info("Skipping database cleanup for successful verification: {$sessionId}");
+                return true;
+            }
+            
+            // Delete the session from the database if it's not a successful verification
+            $deleted = VerificationSession::where('session_id', $sessionId)->delete();
+            
+            if ($deleted) {
+                Log::info("Successfully deleted database entry for session: {$sessionId}");
+                return true;
+            } else {
+                Log::info("No database entry found for session: {$sessionId}");
+                return true;
+            }
+        } catch (\Exception $e) {
+            Log::error("Error during database entry cleanup: " . $e->getMessage());
+            return false;
+        }
+    }
 
+    /**
+     * Clean up a failed verification session
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cleanup(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|string'
+        ]);
+        
+        $sessionId = $request->input('session_id');
+        
+        // Clean up files and database entry without checking for success token
+        $this->cleanupSessionFiles($sessionId, false);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification session cleaned up'
+        ]);
+    }
+
+    
 }

@@ -84,7 +84,10 @@ class NikVerificationController extends Controller
         }
     }
 
-    
+    public function OcrFileSessionUpdate(Request $request)
+    {
+        session(['registration_step' => 4]);
+    }
 
     public function verifyNik(Request $request)
     {
@@ -135,5 +138,28 @@ class NikVerificationController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Verification service unavailable', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function OcrFormSessionUpdate(Request $request)
+    {
+        $request->validate([
+            'nik'  => 'required|string|size:16',
+            'name' => 'required|string|min:2',
+            'dob'  => 'required|date',
+        ]);
+    
+        // Get existing session data
+        $registrationData = session('registration_data', []);
+    
+        // Add new data while preserving the existing session structure
+        $registrationData['nik'] = bcrypt($request->nik);
+        $registrationData['name'] = $request->name;
+        $registrationData['dob'] = $request->dob;
+    
+        // Update session
+        session(['registration_data' => $registrationData]);
+        session(['registration_step' => 5]);
+    
+        return response()->json(['message' => 'NIK data stored successfully'], 200);
     }
 }

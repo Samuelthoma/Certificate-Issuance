@@ -169,42 +169,7 @@ window.FaceVerificationClient = class FaceVerificationClient {
     }
   
     // Complete verification process
-    async completeVerification() {
-      try {
-        this.updateStatus('Finalizing verification...');
-        
-        const response = await this.apiRequest('/complete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            session_id: this.sessionId
-          })
-        });
-        
-        if (!response.success) {
-          this.handleError(response.message || 'Failed to complete verification');
-          return false;
-        }
-        
-        this.verificationToken = response.verification_token;
-        this.updateStatus('Verification completed successfully!');
-        
-        if (this.stream) {
-          this.stream.getTracks().forEach(track => track.stop());
-        }
-        
-        if (this.onComplete) {
-          this.onComplete(this.verificationToken);
-        }
-        
-        return true;
-      } catch (error) {
-        this.handleError('Error completing verification: ' + error.message);
-        return false;
-      }
-    }
+
   
     // Process capture based on current state
     async processCapture() {
@@ -267,16 +232,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
       
       switch (challenge) {
         case 'blink':
-          instructions = 'Please blink a few times naturally';
+          instructions = 'Please blink a few times naturally and press capture';
           break;
         case 'turn_head':
-          instructions = 'Please turn your head slightly left and then right';
+          instructions = 'Please turn your head slightly left or right and press capture';
           break;
         case 'smile':
-          instructions = 'Please smile naturally';
+          instructions = 'Please smile naturally and press capture';
           break;
         default:
-          instructions = 'Follow the on-screen instructions';
+          instructions = 'Follow the on-screen instructions and press capture';
       }
       
       if (this.onChallengeChange) {
@@ -284,14 +249,119 @@ window.FaceVerificationClient = class FaceVerificationClient {
       }
     }
   
-  // Handle errors and refresh page
-    // handleError(message) {
-    //   console.error(message);
-    //   alert(message); 
-    //   setTimeout(() => {
-    //     location.reload(); 
-    //   }, 1500);
-    // }
+    // Handle errors
+    handleError(message) {
+      console.error('Verification error:', message);
+      
+      // Clean up resources
+      this.cleanup();
+      
+      // Notify about the error
+      if (this.onError) {
+        this.onError(message);
+      } else {
+        alert('Verification error: ' + message);
+      }
+      
+      // If we have a session ID, send a cleanup request to the server
+      if (this.sessionId) {
+        this.apiRequest('/cleanup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            session_id: this.sessionId
+          })
+        }).catch(err => console.error('Cleanup request failed:', err));
+      }
+    }
+
+
+    // Add this new method to the FaceVerificationClient class
+    async submitRegistration() {
+      try {
+        if (!this.verificationToken || !this.sessionId) {
+          this.handleError('Missing verification token or session ID');
+          return false;
+        }
+        
+        this.updateStatus('Submitting registration data...');
+        
+        // Submit the registration data along with verification token and session ID
+        const response = await fetch('/complete-registration', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+          },
+          body: JSON.stringify({
+            verification_token: this.verificationToken,
+            session_id: this.sessionId
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration submission failed');
+        }
+        
+        this.updateStatus('Registration completed successfully!');
+        
+        // Redirect to a success page or handle as needed
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        }
+        
+        return true;
+      } catch (error) {
+        this.handleError('Error submitting registration: ' + error.message);
+        return false;
+      }
+    }
+
+    // Modify the completeVerification method to automatically call submitRegistration
+    async completeVerification() {
+      try {
+        this.updateStatus('Finalizing verification...');
+        
+        const response = await this.apiRequest('/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            session_id: this.sessionId
+          })
+        });
+        
+        if (!response.success) {
+          this.handleError(response.message || 'Failed to complete verification');
+          return false;
+        }
+        
+        this.verificationToken = response.verification_token;
+        this.updateStatus('Verification completed successfully!');
+        
+        if (this.stream) {
+          this.stream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Automatically submit registration with verification details
+        await this.submitRegistration();
+        
+        if (this.onComplete) {
+          this.onComplete(this.verificationToken);
+        }
+        
+        return true;
+      } catch (error) {
+        this.handleError('Error completing verification: ' + error.message);
+        return false;
+      }
+    }
+
 
   }
   

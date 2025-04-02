@@ -6,6 +6,7 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Middleware\VerifiedRegistrationMiddleware;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
@@ -25,3 +26,6 @@ Route::get('/face-verification', function () {
 
 Route::post('/complete-registration', [RegistrationController::class, 'completeRegistration'])
     ->middleware(VerifiedRegistrationMiddleware::class);
+Route::get('/dashboard', function () {
+    return view('pages.dashboard');
+})->name('dashboard');

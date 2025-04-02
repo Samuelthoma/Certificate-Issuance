@@ -9,7 +9,7 @@
 </head>
 <pre>{{ print_r(session()->all(), true) }}</pre>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white shadow-md rounded-lg flex w-full max-w-4xl">
+    <div class="bg-white shadow-md rounded-lg flex w-full h-150 max-w-4xl">
         <div class="w-full md:w-2/5 p-8 my-auto justify-center">
             <h2 class="text-3xl font-bold mb-8">
                 @yield('header')

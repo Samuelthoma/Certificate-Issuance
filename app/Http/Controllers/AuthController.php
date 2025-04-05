@@ -14,8 +14,15 @@ class AuthController extends Controller
     }
 
     public function showRegisterForm() {
+        // If session exists AND it's not step 1, redirect to step checker
+        if (session()->has('registration_step') && session('registration_step') != 1) {
+            return redirect()->route('register.check'); // Redirect to the correct step
+        }
+    
+        // If no session or step is 1, show the registration form
         return view('auth.register-form');
     }
+    
 
     public function login(Request $request) {
         $credentials = $request->validate([

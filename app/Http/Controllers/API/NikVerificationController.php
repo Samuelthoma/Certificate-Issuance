@@ -13,12 +13,22 @@ class NikVerificationController extends Controller
 {
 
 
-    public function showOcrFileSubmission(){
+    public function showOcrFileSubmission() {
+        // Check if session exists and is step 3
+        if (!session()->has('registration_step') || session('registration_step') != 3) {
+            return redirect()->route('register.check');
+        }
+    
         return view('auth.ocr-file-submission');
     }
+    
 
-    public function showOcrForm()
-    {
+    public function showOcrForm() {
+        // Check if session exists and is step 4
+        if (!session()->has('registration_step') || session('registration_step') != 4) {
+            return redirect()->route('register.check');
+        }
+    
         return view('auth.ocr-form-submission');
     }
     

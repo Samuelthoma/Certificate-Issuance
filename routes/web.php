@@ -6,10 +6,12 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Middleware\VerifiedRegistrationMiddleware;
+use App\Http\Controllers\RegistrationStepController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::get('/register/check', [RegistrationStepController::class, 'checkStep'])->name('register.check');
 
 Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('send.otp');
 Route::get('/otp', [OtpController::class, 'showOtpForm'])->name('register.otp.form')->Middleware('session:otp');

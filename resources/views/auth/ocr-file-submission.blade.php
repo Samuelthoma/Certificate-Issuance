@@ -16,7 +16,7 @@
 
         <!-- Image Preview -->
         <div id="previewContainer" class="mt-4 hidden">
-            <img id="imagePreview" class="w-full h-full object-cover rounded-lg shadow-md">
+            <img id="imagePreview" class="w-full object-cover rounded-lg shadow-md">
         </div>
 
         <!-- Submit Button -->

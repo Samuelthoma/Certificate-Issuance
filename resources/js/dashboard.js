@@ -34,4 +34,38 @@ document.getElementById("logoutButton").addEventListener("click", async function
 
     sessionStorage.removeItem("token");
     window.location.href = "/login";
+}); 
+
+document.getElementById('uploadInput').addEventListener('change', async function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        alert("You're not logged in.");
+        window.location.href = "/login";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file); // Note: match this with Laravel's `file` key
+
+    try {
+        const response = await fetch('/api/documents/upload', {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            },
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+
+        const result = await response.json();
+        window.location.href = `/workspace/${result.documentId}`; // adjust if your API returns differently
+    } catch (err) {
+        alert('Upload failed. Please try again.');
+        console.error(err);
+    }
 });

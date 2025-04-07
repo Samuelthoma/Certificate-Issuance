@@ -6,26 +6,35 @@ use App\Http\Controllers\OtpController;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Middleware\VerifiedRegistrationMiddleware;
+use App\Http\Controllers\API\FaceVerificationController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 
+//Login and Registration Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 
+//OTP Routes
 Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('send.otp');
 Route::get('/otp', [OtpController::class, 'showOtpForm'])->name('register.otp.form')->Middleware('session:otp');
 Route::post('/verify-otp', [OtpController::class, 'verifyOtp']);
 
+//OCR Routes
 Route::get('/ocr-file', [NikVerificationController::class, 'showOcrFileSubmission'])->name('ocr.file');
 Route::post('/update-registration-file', [NikVerificationController::class, 'OcrFileSessionUpdate']);
 Route::get('/ocr-form', [NikVerificationController::class, 'showOcrForm'])->name('ocr.form');
 Route::post('/update-registration-form', [NikVerificationController::class, 'OcrFormSessionUpdate']);
 
-Route::get('/face-verification', function () {
-    return view('auth.face-verification'); 
-})->name('face-verification');
+//Face Verification Routes
+Route::get('/face-verification', [FaceVerificationController::class, 'showFaceVerification'])->name('face-verification');
 
-Route::post('/complete-registration', [RegistrationController::class, 'completeRegistration'])
-    ->middleware(VerifiedRegistrationMiddleware::class);
-Route::get('/dashboard', function () {
-    return view('pages.dashboard');
-})->name('dashboard');
+// Registration Routes
+Route::post('/complete-registration', [RegistrationController::class, 'completeRegistration'])->middleware(VerifiedRegistrationMiddleware::class);
+
+// Dashboard Routes
+Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
+
+//Workspace Routes
+Route::get('/workspace/{id}', function ($id) {
+    return view('pages.workspace', ['documentId' => $id]);
+});

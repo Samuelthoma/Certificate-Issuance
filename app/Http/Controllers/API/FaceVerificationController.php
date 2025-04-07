@@ -19,6 +19,12 @@ class FaceVerificationController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+
+    public function showFaceVerification()
+    {
+        return view('auth.face-verification'); 
+    }
+
     public function startSession(Request $request)
     {
         // Generate a unique session ID

@@ -53,6 +53,19 @@ document.addEventListener("DOMContentLoaded", function () {
                             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
                         },
                     });
+
+                    function reverseDateFormat(dateStr) {
+                        const parts = dateStr.split("-");
+                        if (parts.length !== 3) return dateStr; 
+                        const [day, month, year] = parts;
+                        return `${year}-${month}-${day}`;
+                    }
+
+                    sessionStorage.setItem("ocr_nik", result.nik);
+                    sessionStorage.setItem("ocr_name", result.name);
+                    sessionStorage.setItem("ocr_dob", reverseDateFormat(result.dob));
+
+
     
                     Swal.fire({
                         toast: true,

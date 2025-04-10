@@ -57,9 +57,14 @@ class OtpController extends Controller
 
     public function showOtpForm()
     {
-        Log::info('After:', session()->all());
-        return view('auth.otp-form');
+        // Check if session exists and is at step 2
+        if (!session()->has('registration_step') || session('registration_step') != 2) {
+            return redirect()->route('register.check'); // Redirect to the correct step
+        }
+    
+        return view('auth.otp-form'); // Load OTP form only if step = 2
     }
+    
 
     public function verifyOtp(Request $request)
     {

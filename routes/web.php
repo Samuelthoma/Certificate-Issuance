@@ -8,11 +8,13 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Middleware\VerifiedRegistrationMiddleware;
 use App\Http\Controllers\API\FaceVerificationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RegistrationStepController;
 use Illuminate\Support\Facades\Auth;
 
 //Login and Registration Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::get('/register/check', [RegistrationStepController::class, 'checkStep'])->name('register.check');
 
 //OTP Routes
 Route::post('/send-otp', [OtpController::class, 'sendOtp'])->name('send.otp');

@@ -96,14 +96,14 @@
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-black text-white p-4 flex items-center justify-between">
+                <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
                     <span class="text-2xl font-bold">
-                        1
+                        0
                     </span>
                     <span class="text-sm">
                         Draft
                     </span>
-                    <i class="fas fa-pencil-alt text-green-500">
+                    <i class="fas fa-pencil-alt text-gray-500">
                     </i>
                 </div>
                 <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
@@ -144,11 +144,11 @@
                 <p class="text-xs text-gray-500 mb-4">
                     Supported files: PDF, Word, Excel, PowerPoint, JPG, PNG, Text
                 </p>
-                <button class="bg-black text-white py-2 px-4 flex items-center justify-center mx-auto">
-                    <i class="fas fa-cloud-upload-alt mr-2">
-                    </i>
-                    Upload document
-                </button>
+                <label class="flex flex-row items-center p-2 bg-black border border-gray-300 rounded-sm shadow-md cursor-pointer w-full lg:w-1/4 justify-center mx-auto">
+                    <i class="fas fa-cloud-upload-alt mr-2 text-white"></i>
+                    <span class="text-md ml-2 text-white">Upload & Sign</span>
+                    <input type="file" id="uploadInput" class="hidden">
+                </label>
             </div>
         </div>
     </div>

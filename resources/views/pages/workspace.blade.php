@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Document Workspace</title>
+        @vite(['resources/css/app.css', 'resources/js/workspace.js', 'resources/js/drawn-sign.js', 'resources/js/typed-sign.js'])
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- PDF.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body
+        class="h-screen font-sans bg-gray-50 text-gray-900 select-none overflow-hidden"
+        data-document-id="{{ $documentId }}"
+    >
+        <header
+            class="h-16 flex items-center px-8 bg-white border-b shadow justify-between"
+        >
+            <div class="flex items-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10" />
+                <span class="ml-2 font-semibold text-xl">Clarisign</span>  
+            </div>
+            <div id="pdf-controls" class="flex items-center gap-4">
+                <ul
+                    class="flex justify-center gap-4 text-gray-900 dark:text-white"
+                >
+                    <li>
+                        <button
+                            id="zoom-out"
+                            aria-label="Zoom Out"
+                            class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+                        >
+                            −
+                        </button>
+                    </li>
+
+                    <li>
+                        <button
+                            id="prev-page"
+                            aria-label="Previous page"
+                            class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="size-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </li>
+
+                    <li
+                        class="flex items-center text-sm font-medium tracking-widest"
+                    >
+                        <span id="page-num">1</span>/<span id="page-count"
+                            >1</span
+                        >
+                    </li>
+
+                    <li>
+                        <button
+                            id="next-page"
+                            aria-label="Next page"
+                            class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="size-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clip-rule="evenodd"
+                                />
+                            </svg>
+                        </button>
+                    </li>
+
+                    <li>
+                        <button
+                            id="zoom-in"
+                            aria-label="Zoom In"
+                            class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+                        >
+                            +
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+        <div class="flex h-full overflow-hidden">
+            <div class="w-1/4 bg-white p-8">
+                <h1 class="text-2xl font-semibold mb-6">Document Preview</h1>
+
+                <label class="font-bold">Document Name</label>
+                <p class="text-gray-500 mb-4" id="document-name"></p>
+
+                <label class="font-bold">Recipients</label>
+                <button
+                    class="w-full bg-blue-300 font-semibold py-2 rounded my-4"
+                >
+                    <i class="fas fa-user mr-2"></i>Add Recipient
+                </button>
+
+                <label class="font-bold">Signature</label>
+                <div class="flex gap-2.5 my-4">
+                    <button
+                        id="open-drawn-signature-modal"
+                        class="w-1/2 bg-yellow-200 py-2 rounded font-semibold items-center justify-center"
+                    >
+                        <i class="fas fa-signature mr-2"></i>Drawn
+                    </button>
+                    <button
+                        id="open-typed-signature-modal"
+                        class="w-1/2 bg-yellow-200 py-2 rounded font-semibold items-center justify-center"
+                    >
+                        <i class="fas fa-font mr-2"></i>Typed
+                    </button>
+                </div>
+
+                <label class="font-bold">Download</label>
+                <button
+                    id="download-btn"
+                    class="w-full bg-green-400 hover:bg-green-500 font-semibold py-2 px-4 rounded my-4"
+                >
+                    <i class="fas fa-download mr-2"></i>Download File
+                </button>
+              </div>
+
+            <div class="w-3/4 py-4 overflow-auto h-full">
+                <div class="flex justify-center mb-4">
+                    <canvas
+                        id="pdf-canvas"
+                        class="hidden border border-gray-300 rounded shadow-lg pointer-events-auto"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Drawn Signature Modal -->
+        <div id="drawn-signature-modal" class="fixed inset-0 bg-black/30 hidden items-center justify-center z-50">
+          <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Draw Your Signature</h2>
+            
+            <div class="relative mb-4">
+              <canvas id="SignCanvas" class="w-full h-48 border border-gray-300 rounded bg-white"></canvas>
+            </div>
+
+            <div class="flex justify-end gap-2">
+              <button id="cancel-signature" class="w-full bg-gray-300 hover:bg-gray-400 font-semibold py-2 px-4 rounded my-4">Cancel</button>
+              <button id="confirm-signature" class="w-full bg-blue-300 hover:bg-blue-400 font-semibold py-2 px-4 rounded my-4">Add Sign</button>
+              <button id="clear-signature" class="w-full bg-red-300 hover:bg-red-400 font-semibold py-2 px-4 rounded my-4">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="typed-signature-modal" class="fixed inset-0 bg-black/30 hidden items-center justify-center z-50">
+          <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h2 class="text-xl font-semibold mb-4">Enter Your Typed Signature</h2>
+            
+            <input
+              type="text"
+              id="typed-signature-input"
+              class="w-full px-4 py-2 border rounded mb-4 focus:outline-none focus:ring focus:border-blue-300"
+              placeholder="Type your full name or initials"
+            />
+
+            <div class="flex justify-end gap-2">
+              <button id="cancel-typed-signature" class="w-full bg-gray-300 hover:bg-gray-400 font-semibold py-2 px-4 rounded my-4">Cancel</button>
+              <button id="confirm-typed-signature" class="w-full bg-blue-300 hover:bg-blue-400 font-semibold py-2 px-4 rounded my-4">Add Sign</button>
+            </div>
+          </div>
+        </div>
+    </body>
+</html>

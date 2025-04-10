@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\API\FaceVerificationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentController;
 use Illuminate\Http\Request;
 
 
@@ -20,7 +21,6 @@ Route::prefix('face-verification')->group(function () {
 });
 
 Route::prefix('v1')->group(function () {
-    Route::post('/verify-nik', [NikVerificationController::class, 'verify']);
     Route::post('/login', [AuthController::class, 'login'])->name('api.login');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api')->name('api.logout');
 
@@ -31,5 +31,10 @@ Route::prefix('v1')->group(function () {
         ]);
     })->name('api.dashboard');
 });
+
+Route::middleware('auth:api')->post('/documents/upload', [DocumentController::class, 'upload']);
+
+Route::middleware('auth:api')->get('/documents/{id}', [DocumentController::class, 'get']);
+
 
 

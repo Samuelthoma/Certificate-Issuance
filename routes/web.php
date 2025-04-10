@@ -40,3 +40,11 @@ Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('d
 Route::get('/workspace/{id}', function ($id) {
     return view('pages.workspace', ['documentId' => $id]);
 });
+
+
+Route::get('/debug/keys', function () {
+    return view('debug.keys');
+})->name('debug.keys.form');
+
+// Debug route to test decryption
+Route::post('/debug/keys', [App\Http\Controllers\OtpController::class, 'debugKeys'])->name('debug.keys');

@@ -15,13 +15,12 @@ return new class extends Migration
             $table->id('cert_id');
             $table->unsignedBigInteger('owner_id');
             $table->string('serial_number')->unique();
-            $table->text('public_key');
             $table->longText('certificate');
-            $table->string('issuer');
-            $table->enum('status', ['active', 'revoked', 'expired']);
-            $table->timestamp('created_at')->useCurrent();
-            $table->foreign('owner_id')->references('id')->on('users');
-        });
+            $table->string('issuer')->default('MyApp CA');
+            $table->enum('status', ['active', 'revoked', 'expired'])->default('active');
+            $table->timestamps();
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade');
+        });        
     }
 
     /**

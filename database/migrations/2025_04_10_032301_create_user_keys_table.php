@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->unique();
             $table->text('encrypted_private_key');
             $table->string('kdf_salt');
+            $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

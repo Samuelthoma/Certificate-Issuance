@@ -22,6 +22,9 @@ class FaceVerificationController extends Controller
 
     public function showFaceVerification()
     {
+        if (!session()->has('registration_step') || session('registration_step') != 5) {
+            return redirect()->route('register.check');
+        }
         return view('auth.face-verification'); 
     }
 

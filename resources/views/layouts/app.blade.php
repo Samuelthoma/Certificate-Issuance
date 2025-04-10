@@ -7,7 +7,6 @@
     @vite(['resources/css/app.css', 'resources/js/register.js'])
     <title>Register Page</title>
 </head>
-<!-- <pre>{{ print_r(session()->all(), true) }}</pre> -->
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white shadow-md rounded-lg flex w-full h-150 max-w-4xl">
         <div class="w-full md:w-2/5 p-8 my-auto justify-center">
@@ -20,5 +19,6 @@
             <img alt="A blurred image of a keyboard and a desk setup" class="w-full h-full object-cover rounded-r-lg" height="400" src="https://storage.googleapis.com/a1aa/image/2DRcrQOjNaXK-xEfW8SEH_eV8KdUZ6doE_VFoTwXyaM.jpg" width="600"/>
         </div>
     </div>
+    <!-- <pre>{{ print_r(session()->all(), true) }}</pre> -->
 </body>
 </html>

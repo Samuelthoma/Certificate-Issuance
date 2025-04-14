@@ -22,3 +22,4 @@ yarn-error.log
 /.zed
 storage/oauth-private.key
 storage/oauth-public.key
+vendor/.env

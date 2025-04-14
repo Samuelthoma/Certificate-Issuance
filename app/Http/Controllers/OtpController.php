@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Otp;
+use App\Models\User; // Added User model import
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Mail\OtpMail;
@@ -33,6 +34,14 @@ class OtpController extends Controller
                 'phone' => 'required|string|digits_between:10,15',
                 'email' => 'required|email'
             ]);
+        }
+
+        // Check if email already exists in User table
+        $existingUser = User::where('email', $request->email)->first();
+        if ($existingUser) {
+            return back()->withErrors([
+                'email' => 'This email is already registered in our system.'
+            ])->withInput($request->except('password'));
         }
     
         // Generate OTP
@@ -92,6 +101,13 @@ class OtpController extends Controller
     
         $email = $registrationData['email'];
     
+        // Double-check email doesn't exist before proceeding with verification
+        $existingUser = User::where('email', $email)->first();
+        if ($existingUser) {
+            session()->flash('error', 'This email is already registered.');
+            return redirect()->route('register.check');
+        }
+    
         $otpRecord = Otp::where('email', $email)
                         ->where('otp_code', $otpCode)
                         ->first();
@@ -150,49 +166,5 @@ class OtpController extends Controller
             session()->flash('error', 'Failed to complete registration. Please try again.');
             return back();
         }
-    }
-    
-    /**
-     * Debug method to verify key encryption/decryption
-     */
-    public function debugKeys(Request $request)
-    {
-        $request->validate([
-            'password' => 'required|string'
-        ]);
-        
-        $registrationData = session('registration_data', []);
-        
-        if (!isset($registrationData['key_data'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No key data found in session'
-            ]);
-        }
-        
-        $keyData = $registrationData['key_data'];
-        
-        // Re-derive the key from the entered password
-        $derivedKey = $this->keyManagementService->deriveKeyFromPassword(
-            $request->password,
-            $keyData['kdf_salt']
-        );
-        
-        // Decrypt the private key
-        $decryptedPrivateKey = $this->keyManagementService->decryptPrivateKey(
-            $keyData['encrypted_private_key'],
-            $derivedKey
-        );
-        
-        // Compare with the original private key (for debugging only)
-        $isMatch = $decryptedPrivateKey === $keyData['debug_private_key'];
-        
-        return response()->json([
-            'success' => true,
-            'matches_original' => $isMatch,
-            'public_key' => $keyData['public_key'],
-            'decrypted_key_preview' => substr($decryptedPrivateKey, 0, 100) . '...',
-            'original_key_preview' => substr($keyData['debug_private_key'], 0, 100) . '...',
-        ]);
     }
 }

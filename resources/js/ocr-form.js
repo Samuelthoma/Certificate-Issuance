@@ -46,6 +46,45 @@ document.addEventListener("DOMContentLoaded", function () {
                 const result = await response.json();
     
                 if (response.ok && result.success) {
+                    // Validate NIK format - must be exactly 16 digits
+                    if (!result.nik || result.nik.length !== 16 || !/^\d{16}$/.test(result.nik)) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            text: 'Your KTP image is unclear or the NIK could not be properly extracted. Please take a clearer picture and try again.',
+                            showConfirmButton: false,
+                            timer: 5000,
+                        });
+                        return;
+                    }
+
+                    // Validate that name is present and not empty
+                    if (!result.name || result.name.trim() === '') {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            text: 'Your name could not be properly extracted from the KTP. Please take a clearer picture and try again.',
+                            showConfirmButton: false,
+                            timer: 5000,
+                        });
+                        return;
+                    }
+
+                    // Validate that DOB has the expected format (DD-MM-YYYY)
+                    if (!result.dob || !/^\d{2}-\d{2}-\d{4}$/.test(result.dob)) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            text: 'Your date of birth could not be properly extracted from the KTP. Please take a clearer picture and try again.',
+                            showConfirmButton: false,
+                            timer: 5000,
+                        });
+                        return;
+                    }
+
                     await fetch("/update-registration-file", {
                         method: "POST",
                         headers: {
@@ -106,65 +145,84 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // **Handle NIK Verification (Only If NIK Input Exists)**
     const nikInput = document.getElementById("nikInput");
-    const nikVerifyButton = document.getElementById("nikVerifyButton");
-    
-    if (nikInput && nikVerifyButton) {
-        const errorMessage = document.getElementById("errorMessage");
-        const nameInput = document.getElementById("nameInput");
-        const dobInput = document.getElementById("dobInput");
-    
-        function showError(message) {
-            errorMessage.classList.remove("hidden");
-            errorMessage.textContent = message;
-        }
-    
-        async function verifyNik() {
-            errorMessage.classList.add("hidden");
-            errorMessage.textContent = "";
-    
-            const nik = nikInput.value.trim();
-            const name = nameInput.value.trim();
-            const dob = dobInput.value;
-    
-            if (nik.length !== 16 || !/^\d{16}$/.test(nik)) {
-                showError("NIK must be exactly 16 digits");
-                return;
-            }
-    
-            if (name.length < 2) {
-                showError("Please enter a valid name");
-                return;
-            }
-    
-            if (!dob) {
-                showError("Please select a date of birth");
-                return;
-            }
-    
+    const nikVerifyButton = document.getElementById("nikVerifyButton"); 
+     
+    if (nikInput && nikVerifyButton) { 
+        const errorMessage = document.getElementById("errorMessage"); 
+        const nameInput = document.getElementById("nameInput"); 
+        const dobInput = document.getElementById("dobInput"); 
+     
+        function showError(message) { 
+            errorMessage.classList.remove("hidden"); 
+            errorMessage.textContent = message; 
+        } 
+     
+        async function verifyNik() { 
+            errorMessage.classList.add("hidden"); 
+            errorMessage.textContent = ""; 
+     
+            const nik = nikInput.value.trim(); 
+            const name = nameInput.value.trim(); 
+            const dob = dobInput.value; 
+     
+            // Frontend validation
+            if (nik.length !== 16 || !/^\d{16}$/.test(nik)) { 
+                showError("NIK must be exactly 16 digits"); 
+                return; 
+            } 
+     
+            if (name.length < 2) { 
+                showError("Please enter a valid name"); 
+                return; 
+            } 
+     
+            if (!dob) { 
+                showError("Please select a date of birth"); 
+                return; 
+            } 
+     
             try {
-                const response = await fetch("/update-registration-form", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                    },
-                    body: JSON.stringify({ nik, name, dob }),
+                // Backend NIK verification using verify-nik endpoint
+                const verifyResponse = await fetch("/api/verify-nik", { 
+                    method: "POST", 
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"), 
+                    }, 
+                    body: JSON.stringify({ nik, name, dob }), 
                 });
     
-                const data = await response.json();
-    
-                if (response.ok) {
-                    window.location.href = "/face-verification";
-                } else {
-                    showError(data.message || "NIK verification failed");
+                const verifyData = await verifyResponse.json();
+                
+                if (!verifyResponse.ok || verifyData.status !== 'success') {
+                    showError(verifyData.message || "NIK verification failed");
+                    return;
                 }
-            } catch (error) {
-                console.error("Verification Error:", error);
-                showError("An unexpected error occurred during verification");
-            }
-        }
-    
-        nikVerifyButton.addEventListener("click", verifyNik);
+                
+                // If verification passes, proceed to update registration form as before
+                const response = await fetch("/update-registration-form", { 
+                    method: "POST", 
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"), 
+                    }, 
+                    body: JSON.stringify({ nik, name, dob }), 
+                }); 
+     
+                const data = await response.json(); 
+     
+                if (response.ok) { 
+                    window.location.href = "/face-verification"; 
+                } else { 
+                    showError(data.message || "Registration update failed"); 
+                } 
+            } catch (error) { 
+                console.error("Verification Error:", error); 
+                showError("An unexpected error occurred during verification"); 
+            } 
+        } 
+     
+        nikVerifyButton.addEventListener("click", verifyNik); 
     }
     
     // Autofill fields with sessionStorage

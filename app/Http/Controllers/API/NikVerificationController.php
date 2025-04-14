@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\NikVerification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\UserProfile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 
@@ -25,9 +27,9 @@ class NikVerificationController extends Controller
 
     public function showOcrForm() {
         // Check if session exists and is step 4
-        if (!session()->has('registration_step') || session('registration_step') != 4) {
-            return redirect()->route('register.check');
-        }
+        // if (!session()->has('registration_step') || session('registration_step') != 4) {
+        //     return redirect()->route('register.check');
+        // }
     
         return view('auth.ocr-form-submission');
     }
@@ -99,6 +101,7 @@ class NikVerificationController extends Controller
         session(['registration_step' => 4]);
     }
 
+
     public function verifyNik(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -106,49 +109,59 @@ class NikVerificationController extends Controller
             'name' => 'required|string|min:2',
             'dob' => 'required|date'
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
-                'status' => 'error', 
-                'message' => 'Invalid input', 
+                'status' => 'error',
+                'message' => 'Invalid input',
                 'errors' => $validator->errors()
             ], 422);
         }
-    
+
         $nik = $request->input('nik');
         $name = $request->input('name');
         $dob = $request->input('dob');
-        
+
         try {
-            $exists = NikVerification::verifyNik($nik);
-            
-            if ($exists) {
-                // Get existing registration data if any
-                $registrationData = session('registration_data', []);
-                
-                // Add the hashed NIK to the registration data
-                $registrationData['nik_hash'] = bcrypt($nik);
-                
-                // You could also store the name and dob if needed
-                $registrationData['name'] = $name;
-                $registrationData['dob'] = $dob;
-                
-                // Update the session
-                session([
-                    'registration_data' => $registrationData,
-                    'registration_step' => 5  
-                ]);
+            // Step 1: Verify against Dukcapil (Firebase)
+            $existsInDukcapil = NikVerification::verifyNik($nik, $name, $dob);
+
+            if (!$existsInDukcapil) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Your Data is Not Found in Dukcapil Database',
+                    'data' => ['nik' => $nik, 'exists' => false]
+                ], 200);
             }
+
+            // Step 2: Check if NIK already exists in local database
+            $existsInApp = UserProfile::get()->contains(function ($profile) use ($nik) {
+                return Hash::check($nik, $profile->nik);
+            });
             
+            if ($existsInApp) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'NIK already registered in this application',
+                    'data' => ['nik' => $nik, 'exists' => true, 'registered' => true]
+                ], 200);
+            }
+            // All good
             return response()->json([
-                'status' => $exists ? 'success' : 'fail',
-                'message' => $exists ? 'NIK is valid' : 'Your Data is Not Found in Dukcapil Database',
-                'data' => ['nik' => $nik, 'exists' => $exists]
+                'status' => 'success',
+                'message' => 'NIK is valid and not yet registered in the application',
+                'data' => ['nik' => $nik, 'exists' => true, 'registered' => false]
             ], 200);
+
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Verification service unavailable', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Verification service unavailable',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+
 
     public function OcrFormSessionUpdate(Request $request)
     {

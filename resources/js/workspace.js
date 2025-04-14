@@ -1,8 +1,10 @@
+import { loadPrivateKey } from './cryptoUtils.js';
 // Disable right-click globally
 document.addEventListener("contextmenu", e => e.preventDefault());
 
 // Disable drag + select on canvas
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async function(){
+  await loadPrivateKey();
   const canvas = document.getElementById("pdf-canvas");
   if (canvas) {
     canvas.setAttribute("draggable", "false");
@@ -70,13 +72,20 @@ document.getElementById("next-page").addEventListener("click", () => {
 async function loadDocument() {
   const documentId = document.body.dataset.documentId;
   const token = sessionStorage.getItem("token");
-
+  const privateKey = sessionStorage.getItem('private_key')
+  console.log(privateKey);
+  
   try {
     const response = await fetch(`/api/documents/${documentId}`, {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        private_key: privateKey  // Pass the private key here
+      })
     });
 
     if (!response.ok) throw new Error("Failed to fetch document");

@@ -34,7 +34,7 @@ Route::prefix('v1')->group(function () {
 
 Route::middleware('auth:api')->post('/documents/upload', [DocumentController::class, 'upload']);
 
-Route::middleware('auth:api')->get('/documents/{id}', [DocumentController::class, 'get']);
+Route::middleware('auth:api')->post('/documents/{id}', [DocumentController::class, 'get']);
 
 
 

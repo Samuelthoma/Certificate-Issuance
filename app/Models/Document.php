@@ -9,7 +9,7 @@ class Document extends Model
 {
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['id', 'user_id', 'file_name', 'file_type', 'file_size', 'file_data'];
+    protected $fillable = ['id', 'user_id', 'file_name', 'file_type', 'file_size', 'encrypted_file_data', 'version_type', 'parent_document_id'];
 
     protected static function boot()
     {

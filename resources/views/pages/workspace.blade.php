@@ -111,7 +111,7 @@
 
                 <label class="font-bold">Recipients</label>
                 <button
-                    class="w-full bg-blue-300 font-semibold py-2 rounded my-4"
+                    class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 my-4"
                 >
                     <i class="fas fa-user mr-2"></i>Add Recipient
                 </button>
@@ -120,13 +120,13 @@
                 <div class="flex gap-2.5 my-4">
                     <button
                         id="open-drawn-signature-modal"
-                        class="w-1/2 bg-yellow-200 py-2 rounded font-semibold items-center justify-center"
+                        class="w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center"
                     >
                         <i class="fas fa-signature mr-2"></i>Drawn
                     </button>
                     <button
                         id="open-typed-signature-modal"
-                        class="w-1/2 bg-yellow-200 py-2 rounded font-semibold items-center justify-center"
+                        class="w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center"
                     >
                         <i class="fas fa-font mr-2"></i>Typed
                     </button>
@@ -135,7 +135,7 @@
                 <label class="font-bold">Download</label>
                 <button
                     id="download-btn"
-                    class="w-full bg-green-400 hover:bg-green-500 font-semibold py-2 px-4 rounded my-4"
+                    class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4"
                 >
                     <i class="fas fa-download mr-2"></i>Download File
                 </button>

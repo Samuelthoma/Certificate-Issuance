@@ -1,4 +1,6 @@
+import { loadPrivateKey } from './cryptoUtils.js';
 document.addEventListener("DOMContentLoaded", async function() {
+    await loadPrivateKey();
     let token = sessionStorage.getItem("token");
 
     if (!token) {

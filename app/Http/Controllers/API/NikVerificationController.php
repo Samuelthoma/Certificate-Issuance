@@ -27,9 +27,9 @@ class NikVerificationController extends Controller
 
     public function showOcrForm() {
         // Check if session exists and is step 4
-        // if (!session()->has('registration_step') || session('registration_step') != 4) {
-        //     return redirect()->route('register.check');
-        // }
+        if (!session()->has('registration_step') || session('registration_step') != 4) {
+            return redirect()->route('register.check');
+        }
     
         return view('auth.ocr-form-submission');
     }

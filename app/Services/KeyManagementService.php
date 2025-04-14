@@ -145,4 +145,104 @@ class KeyManagementService
         
         return $decryptedPrivateKey;
     }
+
+    public function generateKeyDataAndCertificate(array $registrationData): array
+    {
+        // 1. Generate key pair
+        $keyPair = $this->generateKeyPair();
+        
+        // 2. Generate salt and derive encryption key
+        $salt = $this->generateSalt();
+        $derivedKey = $this->deriveKeyFromPassword($registrationData['raw_password'], $salt);
+        
+        // 3. Encrypt private key
+        $encryptedPrivateKey = $this->encryptPrivateKey($keyPair['private_key'], $derivedKey);
+        
+        // 4. Create certificate
+        $privateKeyPem = $keyPair['private_key'];
+        $publicKeyPem = $keyPair['public_key'];
+        
+        // Get CA certificate and private key
+        $caPrivateKey = file_get_contents(storage_path('app/private/ca/ca.key'));
+        $caCertificate = file_get_contents(storage_path('app/private/ca/ca.crt'));
+        
+        // Load CA private key and certificate
+        $caKeyResource = openssl_pkey_get_private($caPrivateKey);
+        $caCertResource = openssl_x509_read($caCertificate);
+        
+        if (!$caKeyResource || !$caCertResource) {
+            Log::error('Failed to load CA materials: ' . openssl_error_string());
+            throw new \Exception('Failed to load CA materials');
+        }
+        
+        // Create a new private key resource from the user's private key
+        $userKeyResource = openssl_pkey_get_private($privateKeyPem);
+        
+        if (!$userKeyResource) {
+            Log::error('Failed to load user private key: ' . openssl_error_string());
+            throw new \Exception('Failed to load user private key');
+        }
+        
+        // Distinguished name for the certificate
+        $dn = [
+            "countryName" => "ID",
+            "stateOrProvinceName" => "Indonesia",
+            "localityName" => "Jakarta",
+            "organizationName" => "MyApp CA",
+            "organizationalUnitName" => "User Services",
+            "commonName" => $registrationData['username'],
+            "emailAddress" => $registrationData['email'],
+        ];
+        
+        // Create a certificate signing request (CSR) with the user's private key
+        $csr = openssl_csr_new($dn, $userKeyResource, ['digest_alg' => 'sha256']);
+        
+        if (!$csr) {
+            Log::error('Failed to create CSR: ' . openssl_error_string());
+            throw new \Exception('Failed to create CSR');
+        }
+        
+        // Sign the CSR with the CA's private key to create a certificate
+        // Generate a unique serial number (numeric)
+        $serialNumberHex = bin2hex(random_bytes(8)); // 8 bytes = 64 bits, suitable for certificate serial
+        $serialNumber = 12345678; // something small and safe
+
+
+        // Sign the CSR with the CA's private key to create a certificate
+        $userCert = openssl_csr_sign($csr, $caCertResource, $caKeyResource, 365, [
+            'digest_alg' => 'sha256',
+            'x509_extensions' => 'v3_req',
+            'serial' => hexdec($serialNumberHex) // Convert hex to decimal for OpenSSL
+        ]);
+        
+        if (!$userCert) {
+            Log::error('Failed to sign CSR: ' . openssl_error_string());
+            throw new \Exception('Failed to sign CSR');
+        }
+        
+        // Export the certificate to PEM format
+        openssl_x509_export($userCert, $certOut);
+        
+        // Generate a unique serial number
+        $serialNumber = strtoupper(Str::uuid());
+        
+        // Log for debugging
+        Log::debug('Generated X.509 certificate (PEM): ' . $certOut);
+        Log::debug('Generated private key (PEM): ' . $privateKeyPem);
+        
+        // Free resources
+        openssl_pkey_free($userKeyResource);
+        openssl_pkey_free($caKeyResource);
+        openssl_x509_free($caCertResource);
+        
+        // 5. Return all cryptographic material
+        return [
+            'public_key' => $publicKeyPem,
+            'encrypted_private_key' => $encryptedPrivateKey,
+            'kdf_salt' => $salt,
+            'certificate' => $certOut,
+            'serial_number' => $serialNumber
+        ];
+    }
+
 }

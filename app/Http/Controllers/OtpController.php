@@ -74,9 +74,9 @@ class OtpController extends Controller
     public function showOtpForm()
     {
         // Check if session exists and is at step 2
-        if (!session()->has('registration_step') || session('registration_step') != 2) {
-            return redirect()->route('register.check'); // Redirect to the correct step
-        }
+        // if (!session()->has('registration_step') || session('registration_step') != 2) {
+        //     return redirect()->route('register.check'); // Redirect to the correct step
+        // }
     
         return view('auth.otp-form'); // Load OTP form only if step = 2
     }
@@ -88,29 +88,22 @@ class OtpController extends Controller
             'otp.*' => 'digits:1'
         ]);
     
-        // Convert array to a single OTP string
         $otpCode = implode('', $request->otp);
-    
-        // Retrieve registration data from session
         $registrationData = session('registration_data', []);
     
-        if (!isset($registrationData['email']) || !isset($registrationData['raw_password'])) {
+        if (!isset($registrationData['email'], $registrationData['raw_password'])) {
             session()->flash('error', 'Session expired. Please request a new OTP.');
             return back();
         }
     
         $email = $registrationData['email'];
     
-        // Double-check email doesn't exist before proceeding with verification
-        $existingUser = User::where('email', $email)->first();
-        if ($existingUser) {
+        if (User::where('email', $email)->exists()) {
             session()->flash('error', 'This email is already registered.');
             return redirect()->route('register.check');
         }
     
-        $otpRecord = Otp::where('email', $email)
-                        ->where('otp_code', $otpCode)
-                        ->first();
+        $otpRecord = Otp::where('email', $email)->where('otp_code', $otpCode)->first();
     
         if (!$otpRecord) {
             session()->flash('error', 'Invalid OTP. Please try again.');
@@ -123,48 +116,26 @@ class OtpController extends Controller
         }
     
         try {
-            // Generate key pair
-            $keyPair = $this->keyManagementService->generateKeyPair();
+            // 🔑 Call service to generate all key and certificate data
+            $keyData = $this->keyManagementService->generateKeyDataAndCertificate($registrationData);
     
-            // Generate salt and derive encryption key
-            $salt = $this->keyManagementService->generateSalt();
-            $derivedKey = $this->keyManagementService->deriveKeyFromPassword(
-                $registrationData['raw_password'],
-                $salt
-            );
+            unset($registrationData['raw_password']); // Clean up sensitive data
+            $registrationData['key_data'] = $keyData;
     
-            // Encrypt private key
-            $encryptedPrivateKey = $this->keyManagementService->encryptPrivateKey(
-                $keyPair['private_key'],
-                $derivedKey
-            );
-    
-            // Remove raw password from session
-            unset($registrationData['raw_password']);
-    
-            // Store only necessary key data
-            $registrationData['key_data'] = [
-                'public_key' => $keyPair['public_key'],
-                'encrypted_private_key' => $encryptedPrivateKey,
-                'kdf_salt' => $salt
-            ];
-    
-            // Update session
             session([
                 'registration_data' => $registrationData,
                 'registration_step' => 3
             ]);
     
-            // Remove used OTP
             $otpRecord->delete();
-    
             session()->flash('success', 'OTP verified successfully.');
             return redirect()->route('ocr.file');
     
         } catch (\Exception $e) {
-            Log::error('Key generation error: ' . $e->getMessage());
+            Log::error('Key/Certificate generation error: ' . $e->getMessage());
             session()->flash('error', 'Failed to complete registration. Please try again.');
             return back();
         }
     }
+    
 }

@@ -84,52 +84,14 @@ class RegistrationController extends Controller
                     'kdf_salt' => $registrationData['key_data']['kdf_salt']
                 ]);
             
-                // === Generate a certificate from public key ===
-            
-                $publicKeyPem = $registrationData['key_data']['public_key'];
-            
-                // Build certificate subject info (customize if needed)
-                $dn = [
-                    "countryName" => "ID",
-                    "stateOrProvinceName" => "Indonesia",
-                    "localityName" => "Jakarta",
-                    "organizationName" => "MyApp CA",
-                    "organizationalUnitName" => "User Services",
-                    "commonName" => $registrationData['name'],
-                    "emailAddress" => $registrationData['email'],
-                ];
-            
-                // Convert public key PEM to OpenSSL key resource
-                $publicKeyResource = openssl_pkey_get_public($publicKeyPem);
-            
-                // Create a dummy private key for signing (since you're the issuer)
-                $caKey = openssl_pkey_new([
-                    "private_key_type" => OPENSSL_KEYTYPE_RSA,
-                    "private_key_bits" => 2048
-                ]);
-            
-                // Create a certificate signing request using public key and DN
-                $csr = openssl_csr_new($dn, $caKey, ["digest_alg" => "sha256"]);
-            
-                // Self-sign the cert for now (valid for 1 year)
-                $cert = openssl_csr_sign($csr, null, $caKey, 365);
-            
-                // Export the cert as a PEM string
-                openssl_x509_export($cert, $certOut);
-            
-                // Save certificate in DB
+                // Save certificate from session directly - no need to regenerate
                 Certificate::create([
                     'owner_id' => $user->id,
-                    'serial_number' => strtoupper(Str::uuid()), // better uniqueness than uniqid
-                    'certificate' => $certOut,
+                    'serial_number' => $registrationData['key_data']['serial_number'],
+                    'certificate' => $registrationData['key_data']['certificate'],
                     'issuer' => 'MyApp CA',
                     'status' => 'active'
                 ]);
-            
-                // Clean up session
-                if (isset($registrationData['key_data']['debug_private_key'])) {
-                    unset($registrationData['key_data']['debug_private_key']);
-                }
             }
     
             // Update verification session with the new user ID

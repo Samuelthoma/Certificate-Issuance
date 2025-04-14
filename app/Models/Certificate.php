@@ -24,7 +24,6 @@ class Certificate extends Model
     protected $fillable = [
         'owner_id',
         'serial_number',
-        'public_key',
         'certificate',
         'issuer',
         'status',

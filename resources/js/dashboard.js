@@ -24,6 +24,37 @@ document.addEventListener("DOMContentLoaded", async function() {
         sessionStorage.removeItem("token");
         window.location.href = "/login";
     }
+
+    try{
+        let response = await fetch("/api/documents", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
+        });
+
+        if (!response.ok) {
+            throw new Error("Unauthorized");
+        }
+
+        let documents = await response.json();
+        const tableBody = document.getElementById("documentsBody");
+
+        documents.forEach(doc => {
+            const row = document.createElement("tr");
+            row.classList.add("hover:bg-gray-100");
+
+            const cell = document.createElement("td");
+            cell.classList.add("px-4", "py-6", "text-sm", "text-gray-800", "font-semibold", "border-2", "overflow-hidden", "whitespace-nowrap", "text-ellipsis");
+            cell.textContent = doc.file_name;
+            cell.addEventListener("click", () => {
+                window.location.href = `/workspace/${doc.id}`;
+            });
+
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+        })
+    }catch (error) {
+        console.error("Error fetching documents:", error);
+    }
 });
 
 document.getElementById("logoutButton").addEventListener("click", async function() {

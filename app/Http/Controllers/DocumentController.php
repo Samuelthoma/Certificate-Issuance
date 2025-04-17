@@ -163,5 +163,15 @@ class DocumentController extends Controller
             return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
         }
     }
+
+    public function index()
+    {
+        $user = Auth::user();
+        $documents = Document::where('user_id', $user->id)
+                     ->orderBy('created_at', 'desc')
+                     ->get();
+
+        return response()->json($documents);
+    }
 }
 

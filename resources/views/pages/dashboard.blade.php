@@ -9,9 +9,9 @@
 </head>
     
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
+    <div class="flex min-h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="w-64 bg-white p-6 fixed h-full md:relative md:w-1/4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="w-64 bg-white p-6 fixed md:relative md:w-1/4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar">
             <div class="flex items-center mb-8">
                 <img alt="Clarisign logo" height="60" src="{{ asset('images/logo.png') }}" width="60"/>
                 <span class="text-xl font-bold">
@@ -24,10 +24,6 @@
             <p class="text-sm font-semibold mb-6">
                 Your Trusted Partner in Digital Identity Verification
             </p>
-            <button class="w-full bg-black text-white py-2 mb-6 flex items-center justify-center">
-                <i class="fas fa-cloud-upload-alt mr-2"></i>
-                Upload document
-            </button>
 
             <nav class="space-y-4">
                 <a class="flex items-center text-black" href="#">
@@ -144,12 +140,21 @@
                 <p class="text-xs text-gray-500 mb-4">
                     Supported files: PDF, Word, Excel, PowerPoint, JPG, PNG, Text
                 </p>
-                <label class="flex flex-row items-center p-2 bg-black border border-gray-300 rounded-sm shadow-md cursor-pointer w-full lg:w-1/4 justify-center mx-auto">
+                <label class="flex flex-row items-center p-2 bg-black border-2 border-black rounded-sm shadow-md cursor-pointer w-full lg:w-1/4 justify-center mx-auto">
                     <i class="fas fa-cloud-upload-alt mr-2 text-white"></i>
                     <span class="text-md ml-2 text-white">Upload & Sign</span>
                     <input type="file" id="uploadInput" class="hidden">
                 </label>
             </div>
+            <table border="1" id="documentsTable" class="min-w-full border border-black divide-y divide-gray-300 rounded-tl-md rounded-tr-md mt-8 overflow-hidden">
+                <thead class="bg-black">
+                    <tr>
+                        <th class="text-left px-4 py-6 text-md font-medium text-white">Your Documents : </th>
+                    </tr>
+                </thead>
+                <tbody id="documentsBody" class="bg-white divide-y divide-gray-100">
+                </tbody>
+            </table>
         </div>
     </div>
     <script>

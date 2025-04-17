@@ -33,10 +33,14 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
                     // Derive key from password and salt using PBKDF2
                     const salt = data.key_material.kdf_salt;
                     const derivedKey = await deriveKeyFromPassword(password, salt);
+                    console.log("Derived Key:", derivedKey);
                     
                     // Decrypt the private key
                     const encryptedPrivateKey = data.key_material.encrypted_private_key;
+                    console.log("Encrypted Private Key:", encryptedPrivateKey);
+
                     const privateKey = await decryptPrivateKey(encryptedPrivateKey, derivedKey);
+                    console.log("Decrypted Private Key:", privateKey);
                     
                     // Generate a random session key for storing the private key securely
                     const sessionKey = crypto.getRandomValues(new Uint8Array(32));

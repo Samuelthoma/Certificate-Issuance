@@ -36,5 +36,7 @@ Route::middleware('auth:api')->post('/documents/upload', [DocumentController::cl
 
 Route::middleware('auth:api')->post('/documents/{id}', [DocumentController::class, 'get']);
 
+Route::middleware('auth:api')->get('/documents', [DocumentController::class, 'index']);
+
 
 

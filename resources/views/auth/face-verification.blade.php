@@ -9,7 +9,7 @@
     <p class="font-bold mb-3" id="status">Click the button below to start verification.</p>
     
     <div class="video-container">
-        <video id="video" autoplay class="w-full h-full rounded-md"></video>
+        <video id="video" autoplay class="w-full rounded-md"></video>
         <canvas id="canvas" style="display: none;"></canvas>
     </div>
     
@@ -48,14 +48,6 @@
                 });
             },
             onComplete: async () => {
-                await Swal.fire({
-                    icon: 'success',
-                    text: 'Verification Complete',
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end',
-                    timer: 2000,
-                });
                 // Reset UI
                 startButton.disabled = false;
                 captureButton.style.display = "none";

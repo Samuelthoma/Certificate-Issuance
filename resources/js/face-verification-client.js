@@ -380,6 +380,14 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         // Redirect to a success page or handle as needed
         if (data.redirect) {
+          await Swal.fire({
+            icon: 'success',
+            text: 'Verification Complete',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer: 2000,
+          });
           window.location.href = data.redirect;
         }
         

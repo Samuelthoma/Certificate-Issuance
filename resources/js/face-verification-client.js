@@ -1,6 +1,3 @@
-// face-verification-client.js
-// This can be used in any frontend (Vue, React, or vanilla JS)
-
 window.FaceVerificationClient = class FaceVerificationClient {
     constructor(apiBaseUrl) {
       this.apiBaseUrl = apiBaseUrl || '/api/face-verification';
@@ -467,5 +464,3 @@ window.FaceVerificationClient = class FaceVerificationClient {
     }
   }
   
-  // Export for use in modules
-  export default FaceVerificationClient;

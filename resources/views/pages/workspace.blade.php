@@ -10,6 +10,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    
+    <style>
+        /* Styles for signature boxes and handles */
+        .signature-box {
+            min-width: 100px;
+            min-height: 40px;
+        }
+        
+        .resize-handle {
+            z-index: 20;
+        }
+        
+        /* Handle hover effect */
+        .resize-handle:hover {
+            background-color: #3b82f6;
+        }
+        
+        /* Signature toolbar items */
+        .signature-toolbar-item {
+            cursor: grab;
+            transition: all 0.2s;
+        }
+        
+        .signature-toolbar-item:active {
+            cursor: grabbing;
+        }
+    </style>
+    <script>
+        // Set up the pdfjsLib global
+        window.pdfjsLib = window['pdfjs-dist/build/pdf'];
+        
+        // Enable compatibility with web workers
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.worker.min.js';
+    </script>
 </head>
 <body class="h-screen font-sans bg-gray-50 text-gray-900 select-none overflow-hidden" data-document-id="{{ $documentId }}">
 
@@ -64,17 +98,17 @@
             <p class="text-gray-500 mb-4 truncate" id="document-name"></p>
 
             <label class="font-bold">Recipients</label>
-            <button class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 my-4">
+            <button class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 my-4 opacity-50" disabled>
                 <i class="fas fa-user mr-2"></i>Add Recipient
             </button>
 
             <label class="font-bold">Signature</label>
             <div class="flex gap-2.5 my-4">
-                <div id="drawn-signature" draggable="true" data-type="drawn" class="signature-toolbar-item flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center">
+                <div id="drawn-signature" class="signature-toolbar-item flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center" data-type="drawn">
                     <i class="fas fa-signature mr-2"></i>Drawn
                 </div>
 
-                <div id="typed-signature" draggable="true" data-type="typed" class="signature-toolbar-item flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center">
+                <div id="typed-signature" class="signature-toolbar-item flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center" data-type="typed">
                     <i class="fas fa-font mr-2"></i>Typed
                 </div>
             </div>
@@ -91,33 +125,32 @@
                 <div class="relative flex justify-center mb-4">
                     <canvas id="pdf-canvas" class="border border-gray-300 rounded shadow-lg" width="595" height="842"></canvas>
 
-                    <div id="canvasOverlay" class="absolute top-0 left-0 z-10 pointer-events-auto cursor-move"></div>
+                    <div id="canvasOverlay" class="absolute top-0 left-0 z-10 pointer-events-none cursor-default"></div>
                 </div>
             </div>
 
-            <!-- Typed Signature Modal -->
+            <!-- Signature Modals -->
             <div id="typedSignatureModal" class="fixed inset-0 bg-black/70 items-center justify-center z-50 hidden">
                 <div class="bg-white p-6 rounded shadow-xl w-96">
                     <h2 class="text-xl font-semibold mb-4">Type Your Signature</h2>
                     <textarea id="typedInput" class="w-full border p-2 rounded mb-4" placeholder="Type your name..."></textarea>
                     <div class="flex justify-end space-x-2">
-                        <button class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-                        <button id="applyTyped" class="px-4 py-2 bg-blue-600 text-white rounded">Apply</button>
+                        <button class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
+                        <button id="applyTyped" class="px-4 py-2 bg-blue-500 text-white rounded">Apply</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Drawn Signature Modal -->
             <div id="drawnSignatureModal" class="fixed inset-0 bg-black/70 items-center justify-center z-50 hidden">
                 <div class="bg-white p-6 rounded shadow-xl w-96">
                     <h2 class="text-xl font-semibold mb-4">Draw Your Signature</h2>
                     <canvas id="drawCanvas" width="300" height="100" class="border mb-4"></canvas>
                     <div class="flex justify-between mb-2">
-                        <button class="px-3 py-1 bg-gray-200 rounded">Clear</button>
+                        <button id="clearCanvas" class="px-3 py-1 bg-gray-200 rounded">Clear</button>
                     </div>
                     <div class="flex justify-end space-x-2">
-                        <button class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-                        <button id="applyDrawn" class="px-4 py-2 bg-blue-600 text-white rounded">Apply</button>
+                        <button class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
+                        <button id="applyDrawn" class="px-4 py-2 bg-blue-500 text-white rounded">Apply</button>
                     </div>
                 </div>
             </div>

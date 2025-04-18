@@ -173,5 +173,22 @@ class DocumentController extends Controller
 
         return response()->json($documents);
     }
+
+    public function destroy($id)
+    {
+        $user = Auth::user();
+        $document = Document::where('id', $id)->where('user_id', $user->id)->first();
+
+        if (!$document) {
+            return response()->json(['message' => 'Document not found or unauthorized.'], 404);
+        }
+
+        try {
+            $document->delete();
+            return response()->json(['message' => 'Document deleted successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete document.'], 500);
+        }
+    }
 }
 

@@ -38,5 +38,8 @@ Route::middleware('auth:api')->post('/documents/{id}', [DocumentController::clas
 
 Route::middleware('auth:api')->get('/documents', [DocumentController::class, 'index']);
 
+Route::middleware('auth:api')->delete('/documents/{id}', [DocumentController::class, 'destroy']);
+
+
 
 

@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     previewContainer.classList.remove("hidden");
                 };
                 reader.readAsDataURL(file);
+            }else{
+                window.location.reload();
             }
         });
     }

@@ -8,13 +8,13 @@
     @vite(['resources/css/app.css', 'resources/js/dashboard.js'])
 </head>
     
-<body class="bg-gray-100 font-sans">
-    <div class="flex min-h-screen overflow-hidden">
+<body class="bg-gray-100 font-sans h-screen overflow-hidden">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="w-64 bg-white p-6 fixed md:relative md:w-1/4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar">
+        <div class="w-64 fixed h-screen top-0 left-0 z-10 bg-white p-6 md:relative md:w-1/4 transition-transform transform -translate-x-full md:translate-x-0" id="sidebar">
             <div class="flex items-center mb-8">
-                <img alt="Clarisign logo" height="60" src="{{ asset('images/logo.png') }}" width="60"/>
-                <span class="text-xl font-bold">
+                <img alt="Clarisign logo" height="45" src="{{ asset('images/logo.png') }}" width="45"/>
+                <span class="text-xl font-bold ml-2">
                     Clarisign
                 </span>
             </div>
@@ -29,12 +29,6 @@
                 <a class="flex items-center text-black" href="#">
                     <i class="fas fa-th-large mr-2"></i>
                     Dashboard
-                </a>
-
-                <a class="flex items-center text-black" href="#">
-                    <i class="fas fa-paper-plane mr-2">
-                    </i>
-                    Sent
                 </a>
 
                 <a class="flex items-center text-black" href="#">
@@ -69,20 +63,17 @@
             </nav>
         </div>
         <!-- Main Content -->
-        <div class="flex-1 p-6">
+        <div class="flex-1 overflow-y-auto p-6">
             <div class="flex justify-between items-center mb-8">
                 <button class="md:hidden text-gray-500" onclick="toggleSidebar()">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <div>
-                    <p class="text-sm text-gray-500">
-                        Welcome back,
+                    <p class="text-sm text-black font-semibold">
+                        Welcome back, Glad to see you again! 
                     </p>
-                    <h1 class="text-2xl" id="user-email">
+                    <h1 class="text-2xl my-2 italic" id="user-email">
                     </h1>
-                    <p class="text-sm text-gray-500">
-                        Glad to see you again!
-                    </p>
                 </div>
                 <div class="flex items-center space-x-4">
                     <i class="fas fa-bell text-xl text-gray-500">
@@ -146,15 +137,10 @@
                     <input type="file" id="uploadInput" class="hidden">
                 </label>
             </div>
-            <table border="1" id="documentsTable" class="min-w-full border border-black divide-y divide-gray-300 rounded-tl-md rounded-tr-md mt-8 overflow-hidden">
-                <thead class="bg-black">
-                    <tr>
-                        <th class="text-left px-4 py-6 text-md font-medium text-white">Your Documents : </th>
-                    </tr>
-                </thead>
-                <tbody id="documentsBody" class="bg-white divide-y divide-gray-100">
-                </tbody>
-            </table>
+            <div class="text-xl font-bold my-8">
+                Documents
+            </div>
+            <div id="documentList" class="space-y-4 mt-4"></div>
         </div>
     </div>
     <script>

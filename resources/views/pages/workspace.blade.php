@@ -16,19 +16,19 @@
     <!-- Header with controls -->
     <header class="h-16 flex items-center px-8 bg-white border-b shadow justify-between">
         <div class="flex items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10" />
-            <span class="ml-2 font-semibold text-xl">Clarisign</span>
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" height="45" width="45" />
+            <span class="ml-2 font-bold text-xl">Clarisign</span>
         </div>
         <div id="pdf-controls" class="flex items-center gap-4">
-            <ul class="flex justify-center gap-4 text-gray-900 dark:text-white">
+            <ul class="flex justify-center gap-4 text-gray-900">
                 <li>
-                    <button id="zoom-out" aria-label="Zoom Out" class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">
+                    <button id="zoom-out" aria-label="Zoom Out" class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-200">
                         −
                     </button>
                 </li>
 
                 <li>
-                    <button id="prev-page" aria-label="Previous page" class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50">
+                    <button id="prev-page" aria-label="Previous page" class="grid size-9 place-content-center rounded border bg-white border-gray-300 transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                         </svg>
@@ -40,7 +40,7 @@
                 </li>
 
                 <li>
-                    <button id="next-page" aria-label="Next page" class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50">
+                    <button id="next-page" aria-label="Next page" class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                         </svg>
@@ -48,7 +48,7 @@
                 </li>
 
                 <li>
-                    <button id="zoom-in" aria-label="Zoom In" class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">
+                    <button id="zoom-in" aria-label="Zoom In" class="grid size-9 place-content-center rounded border border-gray-300 bg-white transition-colors hover:bg-gray-200">
                         +
                     </button>
                 </li>

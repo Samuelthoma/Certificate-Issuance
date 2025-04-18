@@ -36,22 +36,28 @@ document.addEventListener("DOMContentLoaded", async function() {
         }
 
         let documents = await response.json();
-        const tableBody = document.getElementById("documentsBody");
+        const documentList = document.getElementById("documentList");
 
         documents.forEach(doc => {
-            const row = document.createElement("tr");
-            row.classList.add("hover:bg-gray-100");
-
-            const cell = document.createElement("td");
-            cell.classList.add("px-4", "py-6", "text-sm", "text-gray-800", "font-semibold", "border-2", "overflow-hidden", "whitespace-nowrap", "text-ellipsis");
-            cell.textContent = doc.file_name;
-            cell.addEventListener("click", () => {
+            const item = document.createElement("div");
+            item.className = "flex items-center px-6 py-6 hover:bg-gray-100 cursor-pointer rounded-md bg-white border-2 text-md font-bold";
+        
+            const icon = document.createElement("i");
+            icon.className = "fas fa-file-pdf text-red-500 mr-4 text-xl";
+        
+            const text = document.createElement("span");
+            text.className = "bg-gray-300 px-3 rounded-md";
+            text.textContent = doc.file_name;
+        
+            item.appendChild(icon);
+            item.appendChild(text);
+        
+            item.onclick = () => {
                 window.location.href = `/workspace/${doc.id}`;
-            });
-
-            row.appendChild(cell);
-            tableBody.appendChild(row);
-        })
+            }; 
+        
+            documentList.appendChild(item);
+        });        
     }catch (error) {
         console.error("Error fetching documents:", error);
     }

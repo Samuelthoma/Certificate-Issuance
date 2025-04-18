@@ -39,7 +39,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         });
   
         if (!sessionResponse.success) {
-          this.handleError('Failed to start verification session');
+          this.handleError();
+          await Swal.fire({
+            icon: 'error',
+            text: 'Failed to Start Verification Session',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer:2000,
+          })
+          window.location.reload();
           return false;
         }
   
@@ -52,7 +61,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         return true;
       } catch (error) {
-        this.handleError('Error starting verification: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Error Starting Verification',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
@@ -76,7 +94,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         return true;
       } catch (error) {
-        this.handleError('Camera access error: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Please Allow Camera Access',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
@@ -84,7 +111,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
     // Capture current frame from webcam
     captureFrame() {
       if (!this.video || !this.canvas) {
-        this.handleError('Video or canvas element not set');
+        this.handleError();
+        Swal.fire({
+          icon: 'error',
+          text: 'Video or Canvas Element Not Set',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return null;
       }
   
@@ -118,7 +154,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         });
         
         if (!response.success) {
-          this.handleError(response.message || 'Face detection failed');
+          this.handleError();
+          await Swal.fire({
+            icon: 'error',
+            text: 'Face Detection Failed',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer:2000,
+          })
+          window.location.reload();
           return false;
         }
         
@@ -126,7 +171,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         this.updateChallenge(this.currentChallenge);
         return true;
       } catch (error) {
-        this.handleError('Error in face detection: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Error in Face Detection',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
@@ -150,7 +204,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         });
         
         if (!response.success) {
-          this.handleError(response.message || 'Liveness verification failed');
+          this.handleError();
+          await Swal.fire({
+            icon: 'error',
+            text: 'Liveness Verification Failed',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer:2000,
+          })
+          window.location.reload();
           return false;
         }
         
@@ -163,7 +226,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         return true;
       } catch (error) {
-        this.handleError('Error in liveness verification: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Error in Liveness Verification',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
@@ -250,19 +322,7 @@ window.FaceVerificationClient = class FaceVerificationClient {
     }
   
     // Handle errors
-    handleError(message) {
-      console.error('Verification error:', message);
-      
-      // Clean up resources
-      this.cleanup();
-      
-      // Notify about the error
-      if (this.onError) {
-        this.onError(message);
-      } else {
-        alert('Verification error: ' + message);
-      }
-      
+    handleError() {  
       // If we have a session ID, send a cleanup request to the server
       if (this.sessionId) {
         this.apiRequest('/cleanup', {
@@ -282,7 +342,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
     async submitRegistration() {
       try {
         if (!this.verificationToken || !this.sessionId) {
-          this.handleError('Missing verification token or session ID');
+          this.handleError();
+          await Swal.fire({
+            icon: 'error',
+            text: 'Missing Verification Token or Session ID',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer:2000,
+          })
+          window.location.reload();
           return false;
         }
         
@@ -316,7 +385,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         return true;
       } catch (error) {
-        this.handleError('Error submitting registration: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Error Submitting Registration',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
@@ -337,7 +415,16 @@ window.FaceVerificationClient = class FaceVerificationClient {
         });
         
         if (!response.success) {
-          this.handleError(response.message || 'Failed to complete verification');
+          this.handleError();
+          await Swal.fire({
+            icon: 'error',
+            text: 'Failed to Complete Verification',
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            timer:2000,
+          })
+          window.location.reload();
           return false;
         }
         
@@ -357,12 +444,19 @@ window.FaceVerificationClient = class FaceVerificationClient {
         
         return true;
       } catch (error) {
-        this.handleError('Error completing verification: ' + error.message);
+        this.handleError();
+        await Swal.fire({
+          icon: 'error',
+          text: 'Error Completing Verification',
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end',
+          timer:2000,
+        })
+        window.location.reload();
         return false;
       }
     }
-
-
   }
   
   // Export for use in modules

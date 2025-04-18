@@ -37,15 +37,37 @@
                     captureButton.style.display = "inline-block";
                 }
             },
-            onChallengeChange: (challenge, instructions) => alert(instructions),
-            onComplete: (token) => {
-                alert("Verification complete! Token: " + token);
+            onChallengeChange: (challenge, instructions) => await Swal.fire(instructions),{
+                icon: 'info',
+                text: instructions,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end',
+                timer:2000,
+            })
+            onComplete: () => {
+                await Swal.fire(instructions),{
+                icon: 'success',
+                text: 'Verification Complete',
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end',
+                timer:2000,
+                }
                 // Reset UI
                 startButton.disabled = false;
                 captureButton.style.display = "none";
             },
             onError: (error) => {
-                alert("Error: " + error);
+                await Swal.fire(error),{
+                icon: 'error',
+                text: 'Error',
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end',
+                timer:2000,
+                }
+                window.location.reload();
                 startButton.disabled = false;
                 captureButton.style.display = "none";
             }

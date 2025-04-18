@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
+                <div class="bg-blue-200 text-black p-4 flex items-center justify-between">
                     <span class="text-2xl font-bold">
                         0
                     </span>
@@ -93,7 +93,7 @@
                     <i class="fas fa-pencil-alt text-gray-500">
                     </i>
                 </div>
-                <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
+                <div class="bg-amber-200 text-black p-4 flex items-center justify-between">
                     <span class="text-2xl font-bold">
                         0
                     </span>
@@ -103,7 +103,7 @@
                     <i class="fas fa-clock text-gray-500">
                     </i>
                 </div>
-                <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
+                <div class="bg-green-200 text-black p-4 flex items-center justify-between">
                     <span class="text-2xl font-bold">
                         0
                     </span>
@@ -113,7 +113,7 @@
                     <i class="fas fa-check-square text-gray-500">
                     </i>
                 </div>
-                <div class="bg-gray-200 text-black p-4 flex items-center justify-between">
+                <div class="bg-red-200 text-black p-4 flex items-center justify-between">
                     <span class="text-2xl font-bold">
                         0
                     </span>

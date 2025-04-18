@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
         documents.forEach(doc => {
             const item = document.createElement("div");
-            item.className = "flex items-center px-6 py-6 hover:bg-gray-100 cursor-pointer rounded-md bg-white border-2 text-md font-bold";
+            item.className = "flex items-center px-6 py-6 hover:bg-gray-100 cursor-pointer rounded-md bg-white border-2 text-md font-bold border-r-5 border-b-5 hover:border-r-3 hover:border-b-3";
         
             const icon = document.createElement("i");
             icon.className = "fas fa-file-pdf text-red-500 mr-4 text-xl";

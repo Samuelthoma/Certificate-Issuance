@@ -18,7 +18,7 @@ class DocumentController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'file' => 'required|file|max:65536', 
+            'file' => 'required|file|max:65536|mimes:pdf', 
         ]);
 
         $file = $request->file('file');

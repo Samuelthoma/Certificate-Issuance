@@ -23,3 +23,5 @@ yarn-error.log
 storage/oauth-private.key
 storage/oauth-public.key
 vendor/.env
+.env
+.env.*

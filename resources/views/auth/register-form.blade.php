@@ -57,5 +57,12 @@
             <button class="w-full bg-black text-white py-2 rounded" type="submit">Send OTP</button>
         </div>
     </form>
+    <div class="text-center">
+        <p class="text-sm text-gray-600">Already have an account? <a href="/login" class="text-blue-500">Login</a></p>
+    </div>
+    <!-- <p class="text-sm text-gray-700 text-center mt-4">Already have an account? 
+        <a href="login" class="text-blue-600 hover:underline font-medium">Login</a>
+    </p> -->
+
 
 @endsection

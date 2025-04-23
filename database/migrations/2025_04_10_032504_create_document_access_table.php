@@ -16,8 +16,8 @@ return new class extends Migration
             $table->uuid('document_id');
             $table->unsignedBigInteger('user_id');
             $table->text('encrypted_aes_key');
-            $table->foreign('document_id')->references('id')->on('documents');
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('document_id')->references('id')->on('documents')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

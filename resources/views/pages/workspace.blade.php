@@ -98,9 +98,10 @@
             <p class="text-gray-500 mb-4 truncate" id="document-name"></p>
 
             <label class="font-bold">Recipients</label>
-            <button class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 my-4 opacity-50" disabled>
-                <i class="fas fa-user mr-2"></i>Add Recipient
-            </button>
+            <div class="flex border-2 font-semibold my-4 ">
+                <input type="email" id="recipient-email" class="w-5/6 focus:outline-none py-2 px-2" placeholder="Add Recipient" />
+                <button class="w-1/6 border-l-2 hover:bg-gray-200"><i class="fas fa-user"></i></button>
+            </div>
 
             <label class="font-bold">Signature</label>
             <div class="flex gap-2.5 my-4">

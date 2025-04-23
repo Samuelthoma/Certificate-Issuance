@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Document;
 use App\Models\Certificate;
 use App\Models\UserKey;
+use App\Models\DocumentAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -67,10 +68,10 @@ class DocumentController extends Controller
 
         openssl_free_key($publicKey);
 
+        $encryptred_dek = base64_encode($encryptedDek);
+
         $envelope = base64_encode(json_encode([
-            'iv' => base64_encode($iv),
-            'encrypted_data' => base64_encode($encryptedData),
-            'encrypted_dek' => base64_encode($encryptedDek)
+            'encrypted_data' => base64_encode($encryptedData)
         ]));
 
         // 5. Store the encrypted document in the database
@@ -84,6 +85,13 @@ class DocumentController extends Controller
             'encrypted_file_data' => $envelope,
             'version_type' => 'original',
             'parent_document_id' => null,
+            'iv' => base64_encode($iv),
+        ]);
+
+        DocumentAccess::create([
+            'document_id' => $doc->id,
+            'user_id' => $doc->user_id,
+            'encrypted_aes_key' => $encryptred_dek,
         ]);
 
         return response()->json(['documentId' => $doc->id], 201);
@@ -97,6 +105,10 @@ class DocumentController extends Controller
         $document = Document::where('id', $id)
                     ->where('user_id', $user->id)
                     ->firstOrFail();
+
+        $documentAccess = DocumentAccess::where('document_id', $id)
+                            ->where('user_id', $user->id)
+                            ->first();
                     
         Log::debug('Document retrieved successfully', ['id' => $id, 'file_name' => $document->file_name]);
 
@@ -105,16 +117,18 @@ class DocumentController extends Controller
             $envelopeJson = base64_decode($document->encrypted_file_data);
             $envelope = json_decode($envelopeJson, true);
             
-            if(!$envelope || !isset($envelope['iv'], $envelope['encrypted_data'], $envelope['encrypted_dek'])){
+            if(!$envelope){
                 Log::error('Invalid envelope format', ['id' => $id]);
                 return response()->json(['error' => 'Invalid envelope format'], 400);
             }
             
             Log::debug('Envelope decoded successfully');
 
-            $iv = base64_decode($envelope['iv']);
+            $iv = base64_decode($document->iv);
+            Log::debug('IV length: ' . strlen($iv)); // Must be 16 bytes
             $encryptedData = base64_decode($envelope['encrypted_data']);
-            $encryptedDek = base64_decode($envelope['encrypted_dek']);
+
+            $encryptedDek = base64_decode($documentAccess->encrypted_aes_key);
 
             // 2. Decrypt the DEK
             $privateKeyRaw = $request->get('private_key');

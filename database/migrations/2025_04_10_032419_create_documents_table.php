@@ -20,7 +20,7 @@ return new class extends Migration
             $table->longText('encrypted_file_data');
             $table->enum('version_type', ['original', 'signed'])->default('original');
             $table->uuid('parent_document_id')->nullable();
-
+            $table->string('iv');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();        
             $table->foreign('user_id')->references('id')->on('users');

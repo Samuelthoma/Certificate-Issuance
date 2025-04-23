@@ -117,6 +117,16 @@
             <button id="download-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
                 <i class="fas fa-download mr-2"></i>Download File
             </button>
+
+            <label class="font-bold">Save</label>
+            <button id="save-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                <i class="fas fa-save mr-2"></i>Save Draft
+            </button>
+
+            <label class="font-bold">Finalize</label>
+            <button id="save-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                <i class="fas fa-check-circle mr-2"></i>Finalize Document
+            </button>
         </div>
 
         <div class="w-3/4 py-4 overflow-auto h-full">

@@ -57,7 +57,7 @@
                     <i class="fas fa-file-alt mr-2 w-5 text-center"></i>
                     Reports
                 </a>
-                <a id="logoutButton" class="flex items-center text-red-500 p-3 hover:bg-red-100 hover:rounded-md font-semibold">
+                <a id="logoutButton" class="flex items-center text-red-500 p-3 hover:bg-red-100 hover:rounded-md font-semibold cursor-pointer">
                     <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i>
                     Log Out
                 </a>

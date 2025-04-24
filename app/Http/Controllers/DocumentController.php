@@ -17,27 +17,27 @@ class DocumentController extends Controller
     public function upload(Request $request)
     {
         $user = Auth::user();
-
+    
         $request->validate([
             'file' => 'required|file|max:65536|mimes:pdf', 
         ]);
-
+    
         $file = $request->file('file');
         $base64 = base64_encode(file_get_contents($file));
         
         // 1. Generate AES-256 DEK
         $dek = random_bytes(32);
         Log::debug('DEK Generated : ' . $dek . ' length: ' . strlen($dek)); // Must be 32 bytes
-
+    
         // 2. Encrypt the document content with the DEK using AES-256-CBC
         $iv = random_bytes(16);
         Log::debug('IV Generated : ' . $iv . ' length: ' . strlen($iv)); // Must be 16 bytes
         $encryptedData = openssl_encrypt($base64, 'aes-256-cbc', $dek, OPENSSL_RAW_DATA, $iv);
-
+    
         if($encryptedData === false){
             return response()->json(['error' => 'Failed to encrypt file'], 500);
         }
-
+    
         // 3. Fetch the public key from the database
         $certificate = Certificate::where('owner_id', $user->id)
                        ->where('status', 'active')
@@ -46,38 +46,38 @@ class DocumentController extends Controller
         if (!$certificate) {
             return response()->json(['error' => 'Certificate not found'], 400);
         }
-
+    
         // 4. Encrypt the DEK with the public key using RSA
         $certResource = openssl_x509_read($certificate->certificate);
         
         if (!$certResource) {
             return response()->json(['error' => 'Invalid public key'], 500);
         }
-
+    
         $publicKey = openssl_get_publickey($certResource);
         if (!$publicKey) {
             return response()->json(['error' => 'Failed to get public key'], 500);
         }
-
+    
         $encryptedDek = null;
         $encryptSuccess = openssl_public_encrypt($dek, $encryptedDek, $publicKey);
-
+    
         if(!$encryptSuccess){
             return response()->json(['error' => 'Failed to encrypt DEK'], 500);
         }
-
+    
         openssl_free_key($publicKey);
-
+    
         $encryptred_dek = base64_encode($encryptedDek);
-
+    
         $envelope = base64_encode(json_encode([
             'encrypted_data' => base64_encode($encryptedData)
         ]));
-
-        // 5. Store the encrypted document in the database
-        $documentId = (string) Str::uuid();
-        $doc = Document::create([
-            'id' => $documentId,
+    
+        // 5. Store the original document in the database
+        $originalDocumentId = (string) Str::uuid();
+        $originalDoc = Document::create([
+            'id' => $originalDocumentId,
             'user_id' => $user->id,
             'file_name' => $file->getClientOriginalName(),
             'file_type' => $file->getClientMimeType(),
@@ -87,16 +87,42 @@ class DocumentController extends Controller
             'parent_document_id' => null,
             'iv' => base64_encode($iv),
         ]);
-
+    
         DocumentAccess::create([
-            'document_id' => $doc->id,
-            'user_id' => $doc->user_id,
+            'document_id' => $originalDoc->id,
+            'user_id' => $originalDoc->user_id,
             'encrypted_aes_key' => $encryptred_dek,
         ]);
-
-        return response()->json(['documentId' => $doc->id], 201);
+    
+        // 6. Create duplicate document for logging/archival purposes
+        $duplicateDocumentId = (string) Str::uuid();
+        $duplicateDoc = Document::create([
+            'id' => $duplicateDocumentId,
+            'user_id' => $user->id,
+            'file_name' => $file->getClientOriginalName(),
+            'file_type' => $file->getClientMimeType(),
+            'file_size' => $file->getSize(),
+            'encrypted_file_data' => $envelope,
+            'version_type' => 'duplicate',
+            'parent_document_id' => $originalDoc->id, // Reference to original document
+            'iv' => base64_encode($iv),
+        ]);
+    
+        // Create access record for the duplicate document
+        DocumentAccess::create([
+            'document_id' => $duplicateDoc->id,
+            'user_id' => $duplicateDoc->user_id,
+            'encrypted_aes_key' => $encryptred_dek,
+        ]);
+    
+        // Return the duplicate document ID instead of the original
+        return response()->json([
+            'documentId' => $duplicateDoc->id,
+            'originalDocumentId' => $originalDoc->id
+        ], 201);
     }
 
+    
     public function get(Request $request, $id)
     {
         Log::debug('Raw content', ['raw' => $request->getContent()]);

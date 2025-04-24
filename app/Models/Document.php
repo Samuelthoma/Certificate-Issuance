@@ -18,4 +18,14 @@ class Document extends Model
             $model->id = (string) Str::uuid();
         });
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function accessList()
+    {
+        return $this->hasMany(DocumentAccess::class);
+    }
+
 }

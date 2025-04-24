@@ -1,3 +1,10 @@
+@if(session('alert'))
+    <script>
+        alert("{{ session('alert') }}");
+    </script>
+@endif
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

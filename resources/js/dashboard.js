@@ -1,4 +1,23 @@
 import { loadPrivateKey } from './cryptoUtils.js';
+
+window.onload = async function () {
+    const alertMessage = sessionStorage.getItem('alertMessage');
+  
+    if (alertMessage) {
+      await Swal.fire({
+        icon: 'error',
+        text: alertMessage,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+  
+      sessionStorage.removeItem('alertMessage');
+    }
+  };
+  
+
 document.addEventListener("DOMContentLoaded", async function() {
     await loadPrivateKey();
     let token = sessionStorage.getItem("token");
@@ -49,7 +68,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         
             const contentWrapper = document.createElement("div");
             contentWrapper.className = "flex items-center flex-1";
-            contentWrapper.onclick = () => {
+            item.onclick = () => {
                 window.location.href = `/workspace/${doc.id}`;
             };
 

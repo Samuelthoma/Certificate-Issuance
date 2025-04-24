@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Models\Certificate;
 use App\Models\UserKey;
 use App\Models\DocumentAccess;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -102,9 +103,12 @@ class DocumentController extends Controller
         Log::debug('Raw content', ['raw' => $request->getContent()]);
 
         $user = Auth::user();
-        $document = Document::where('id', $id)
-                    ->where('user_id', $user->id)
-                    ->firstOrFail();
+        $document = Document::with('user')
+                    ->where('id', $id)
+                    ->whereHas('accessList', function ($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    })
+                    ->first();
 
         $documentAccess = DocumentAccess::where('document_id', $id)
                             ->where('user_id', $user->id)
@@ -167,7 +171,9 @@ class DocumentController extends Controller
             return response()->json([
                 'file_name' => $document->file_name,
                 'file_type' => $document->file_type,
-                'file_data' => $decryptedContent
+                'file_data' => $decryptedContent,
+                'file_owner' => $document->user->email,
+                'file_id' => $document->id,
             ]);
         } catch (\Exception $e) {
             Log::error('Exception in document decryption', [
@@ -203,6 +209,95 @@ class DocumentController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete document.'], 500);
         }
+    }
+
+    public function addCollaborator(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = Auth::user();
+
+        $document = Document::findOrFail($id);
+        if($user->id !== $document->user_id){
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        
+        $recipient = User::where('email', $request->email)->first();
+        if (!$recipient) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if (DocumentAccess::where('document_id', $document->id)->where('user_id', $recipient->id)->exists()) {
+            return response()->json(['message' => 'User already has access'], 409);
+        }
+
+        // Decrypt Owner's DEK
+        $documentAccess = DocumentAccess::where('document_id', $id)
+                            ->where('user_id', $user->id)
+                            ->first();
+
+        $encryptedDek = base64_decode($documentAccess->encrypted_aes_key);
+        Log::debug($encryptedDek);
+
+        $privateKeyRaw = $request->get('private_key');
+        Log::debug('Private key retrieved from session' . $privateKeyRaw);
+        $privateKeyPem = str_replace("\\n", "\n", $privateKeyRaw);
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        $dek = null;
+
+        $decryptedDek = openssl_private_decrypt($encryptedDek, $dek, $privateKey);
+        Log::debug('DEK length after decrypt: ' . strlen($dek) . $dek); 
+        openssl_free_key($privateKey);
+
+        if (!$decryptedDek) {
+            Log::error('Failed to decrypt DEK');
+                return response()->json(['error' => 'Failed to decrypt DEK'], 500);
+            }
+        Log::debug('DEK decrypted successfully');
+        // End Decrypt Owner's DEK
+
+        // Encrypt DEK with recipient's public key
+        $recipientCertificate = Certificate::where('owner_id', $recipient->id)
+                            ->where('status', 'active')
+                            ->first();
+
+        $certResource = openssl_x509_read($recipientCertificate->certificate);
+        $publicKey = openssl_get_publickey($certResource);
+
+        $encryptedDekForRecipient = null;
+
+        openssl_public_encrypt($dek, $encryptedDekForRecipient, $publicKey);
+        openssl_free_key($publicKey);
+
+        $encryptred_dek = base64_encode($encryptedDekForRecipient);
+        DocumentAccess::create([
+            'document_id' => $document->id,
+            'user_id' => $recipient->id,
+            'encrypted_aes_key' => $encryptred_dek,
+        ]);
+        return response()->json(['message' => 'Collaborator added successfully']);
+        // End Encrypt DEK with recipient's public key
+    }
+
+    public function getCollaborators($documentId){
+        $user = Auth::user();
+
+        $document = Document::with('user')
+                    ->where('id', $documentId)
+                    ->whereHas('accessList', function ($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    })
+                    ->firstOrFail();
+
+        $collaborators = DocumentAccess::with('user')
+            ->where('document_id', $documentId)
+            ->where('user_id', '!=', $document->user_id)
+            ->get()
+            ->pluck('user');
+
+        return response()->json(['collaborators' => $collaborators->values()]);
     }
 }
 

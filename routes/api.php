@@ -40,6 +40,10 @@ Route::middleware('auth:api')->get('/documents', [DocumentController::class, 'in
 
 Route::middleware('auth:api')->delete('/documents/{id}', [DocumentController::class, 'destroy']);
 
+Route::middleware('auth:api')->post('/documents/{id}/collaborators', [DocumentController::class, 'addCollaborator']);
+
+Route::middleware('auth:api')->post('/documents/getCollaborators/{documentId}', [DocumentController::class, 'getCollaborators']);
+
 
 
 

@@ -97,12 +97,6 @@
             <label class="font-bold">Document Name</label>
             <p class="text-gray-500 mb-4 truncate" id="document-name"></p>
 
-            <label class="font-bold">Recipients</label>
-            <div class="flex border-2 font-semibold my-4 ">
-                <input type="email" id="recipient-email" class="w-5/6 focus:outline-none py-2 px-2" placeholder="Add Recipient" />
-                <button class="w-1/6 border-l-2 hover:bg-gray-200"><i class="fas fa-user"></i></button>
-            </div>
-
             <label class="font-bold">Signature</label>
             <div class="flex gap-2.5 my-4">
                 <div id="drawn-signature" class="signature-toolbar-item flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center" data-type="drawn">
@@ -130,7 +124,7 @@
             </button>
         </div>
 
-        <div class="w-3/4 py-4 overflow-auto h-full">
+        <div class="w-1/2 py-4 overflow-auto h-full">
             <!-- PDF Canvas Area -->
             <div class="flex justify-center mb-4">
                 <div class="relative flex justify-center mb-4">
@@ -163,6 +157,21 @@
                         <button class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
                         <button id="applyDrawn" class="px-4 py-2 bg-blue-500 text-white rounded">Apply</button>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white w-1/4 p-8">
+            <label class="font-bold">Recipients</label>
+            <div class="flex border-2 font-semibold my-4 ">
+                <input type="email" id="collaborator-email" class="w-5/6 focus:outline-none py-2 px-2" placeholder="Add Recipient" name="email"/>
+                <button id="add-collaborator-btn" class="w-1/6 border-l-2 hover:bg-gray-200"><i class="fas fa-user"></i></button>
+            </div>
+
+            <label class="font-bold">Collaborators</label>
+            <div id="collaborators">
+                <div class="flex items-center p-1 mb-2 mt-2">
+                    <i class="fas fa-user-shield mr-4 w-4 text-gray-500"></i>
+                    <p class="text-gray-500 truncate" id="document-owner"></p>
                 </div>
             </div>
         </div>

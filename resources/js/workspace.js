@@ -1,4 +1,6 @@
 import { loadPrivateKey } from './cryptoUtils.js';
+import { getCollaborators } from './collaborator/getCollaborator.js';
+import { addCollaborator } from './collaborator/addCollaborator.js';
 
 let pdfDoc = null;
 let currentPage = 1;
@@ -111,7 +113,10 @@ async function loadDocument() {
       body: JSON.stringify({ private_key: privateKey })
     });
 
-    if (!response.ok) throw new Error("Failed to fetch document");
+    if (!response.ok) {
+      sessionStorage.setItem('alertMessage', 'Document not found');
+      window.location.href = "/dashboard";
+    };
 
     const data = await response.json();
     const { file_type, file_data, file_name } = data;
@@ -123,6 +128,8 @@ async function loadDocument() {
       if (documentNameElement) {
         documentNameElement.textContent = file_name;
       }
+
+      addCollaborator();
       
       window.originalBase64Data = file_data;
       window.originalFileName = "Signed " + file_name;
@@ -267,6 +274,8 @@ document.addEventListener("DOMContentLoaded", async function() {
   } catch (err) {
     console.error("Error initializing workspace:", err);
   }
+
+  getCollaborators();
 });
 
 // Disable Context Menu

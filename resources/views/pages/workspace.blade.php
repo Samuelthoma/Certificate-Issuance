@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Document Workspace</title>
-    @vite(['resources/css/app.css', 'resources/js/workspace.js', 'resources/js/signature.js'])
+    @vite(['resources/css/app.css', 'resources/js/workspace/initWorkspace.js'])
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- PDF.js -->

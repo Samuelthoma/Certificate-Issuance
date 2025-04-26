@@ -5,6 +5,7 @@ use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\API\FaceVerificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\API\SignatureController;
 use Illuminate\Http\Request;
 
 
@@ -44,6 +45,6 @@ Route::middleware('auth:api')->post('/documents/{id}/collaborators', [DocumentCo
 
 Route::middleware('auth:api')->post('/documents/getCollaborators/{documentId}', [DocumentController::class, 'getCollaborators']);
 
-
+Route::post('/signatures/save-draft', [SignatureController::class, 'saveDraft']);
 
 

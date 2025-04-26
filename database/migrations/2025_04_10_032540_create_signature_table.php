@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('signatures', function (Blueprint $table) {
@@ -16,12 +19,17 @@ return new class extends Migration
             $table->float('rel_y');
             $table->float('rel_width');
             $table->float('rel_height');
+            $table->enum('type', ['typed', 'drawn']);
+            $table->longText('content'); // Text for typed or Base64 image for drawn
             $table->timestamps();
-            
-            $table->foreign('document_id')->references('id')->on('documents')->cascadeOnDelete();
+
+            $table->foreign('document_id')->references('id')->on('documents')->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('signatures');

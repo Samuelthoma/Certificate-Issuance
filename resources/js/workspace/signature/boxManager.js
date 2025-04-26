@@ -4,8 +4,6 @@ import { addResizeHandles } from './resizeHandlers.js';
 import { selectBox } from './eventHandlers.js';
 import { drawnSignatures, applySignatureToBox } from './signatureHandling.js';
 
-
-
 // State variables
 let currentPage = 1;
 let signatureBoxes = {}; // Store boxes by page number
@@ -30,10 +28,14 @@ export function createSignatureBox(type, left, top, width, height) {
   const boxId = crypto.randomUUID();
   const box = document.createElement("div");
   
+  // Get the current user ID from session storage
+  const userId = sessionStorage.getItem("user_id");
+  
   // Set basic styles
   box.className = "signature-box absolute border-2 border-gray-400 bg-white bg-opacity-50 cursor-move";
   box.dataset.type = type;
   box.dataset.boxId = boxId;
+  box.dataset.userId = userId; // Add user ID to the element's dataset
   box.style.left = `${left}px`;
   box.style.top = `${top}px`;
   box.style.width = `${width}px`;
@@ -83,9 +85,10 @@ export function createSignatureBox(type, left, top, width, height) {
   const relWidth = width / overlay.clientWidth;
   const relHeight = height / overlay.clientHeight;
   
-  // Store box data
+  // Store box data with user ID
   signatureBoxes[currentPage].push({
     id: boxId,
+    userId: userId, // Store the user ID in the box data
     type,
     relX,
     relY,
@@ -173,7 +176,7 @@ export function loadBoxesForCurrentPage() {
   
   // Create DOM elements for all stored boxes
   signatureBoxes[currentPage].forEach(boxData => {
-    const { type, relX, relY, relWidth, relHeight, id } = boxData;
+    const { type, relX, relY, relWidth, relHeight, id, userId } = boxData;
     
     // Convert relative positions to absolute
     const left = relX * overlay.clientWidth;
@@ -186,6 +189,7 @@ export function loadBoxesForCurrentPage() {
     box.className = "signature-box absolute border-2 border-gray-400 bg-white bg-opacity-50 cursor-move";
     box.dataset.type = type;
     box.dataset.boxId = id;
+    box.dataset.userId = userId; // Add user ID to the element's dataset
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
     box.style.width = `${width}px`;

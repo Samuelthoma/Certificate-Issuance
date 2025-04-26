@@ -20,6 +20,8 @@ async function checkAndLoadUser() {
         }
 
         const data = await response.json();
+        sessionStorage.setItem("user_id", data.user.id);
+        sessionStorage.setItem("user_email", data.user.email);
         document.getElementById("user-email").innerText = data.user.username;
     } catch (error) {
         sessionStorage.removeItem("token");

@@ -3,6 +3,7 @@ import { renderPDFPage, getCurrentPage } from './pdfRenderer.js';
 import { loadDocument, initDownloadButton } from './documentLoader.js';
 import { initPaginationControls, initZoomControls } from './uiControls.js';
 import { secureCanvas, initContextMenuProtection } from './securityUtils.js';
+import saveDraftHandler from './saveDraft.js';
 
 async function initializeDocument() {
   try {
@@ -14,6 +15,9 @@ async function initializeDocument() {
     initDownloadButton();
     secureCanvas();
     initContextMenuProtection();
+    
+    // Initialize save draft functionality
+    saveDraftHandler.init();
     
     return true;
   } catch (err) {

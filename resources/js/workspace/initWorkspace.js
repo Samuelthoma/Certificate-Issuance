@@ -1,7 +1,6 @@
 // initWorkspace.js - Main entry point for the workspace functionality
-import { loadPrivateKey } from '../cryptoUtils.js';
-import { getCollaborators } from './collaborator/getCollaborator.js';
-import { addCollaborator } from './collaborator/addCollaborator.js';
+import { loadPrivateKey } from '../login/cryptoUtils.js';
+import { addCollaborator, getCollaborators } from './collaborator/index.js';
 import { initializeDocument, exposeCurrentPage } from './document/index.js';
 import signatureSystem from './signature/index.js';
 

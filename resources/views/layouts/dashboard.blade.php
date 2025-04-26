@@ -13,7 +13,7 @@
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/css/app.css', 'resources/js/dashboard.js'])
+    @vite(['resources/css/app.css', 'resources/js/dashboard/index.js'])
 </head>
     
 <body class="bg-gray-100 font-sans h-screen overflow-hidden">

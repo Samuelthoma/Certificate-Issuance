@@ -27,5 +27,5 @@
                 <a class="text-black font-bold" href="/register">Register now</a>
             </p>
         </form>
-        @vite('resources/js/login.js')   
+        @vite('resources/js/login/login.js')   
     @endsection

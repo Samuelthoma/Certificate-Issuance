@@ -40,5 +40,5 @@
         </div>
     </form>
 
-    @vite('resources/js/ocr-form.js')
+    @vite('resources/js/register/ocr-form.js')
 @endsection

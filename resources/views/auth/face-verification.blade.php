@@ -2,7 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section('content')
 
-@vite('resources/js/face-verification-client.js')
+@vite('resources/js/register/face-verification-client.js')
 
 <div class="container text-center">
     <h2 class="text-3xl font-bold mb-8">Face Verification</h2>

@@ -24,5 +24,5 @@
             <button id="submitButton" class="w-full bg-black text-white py-2 rounded" type="button">Submit</button>
         </div>
     </form>
-    @vite('resources/js/ocr-form.js')
+    @vite('resources/js/register/ocr-form.js')
 @endsection

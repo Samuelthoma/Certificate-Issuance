@@ -16,13 +16,12 @@ return new class extends Migration
             $table->uuid('document_id');
             $table->unsignedBigInteger('signer_id');
             $table->unsignedBigInteger('certificate_id');
-            $table->longText('signed_file_data');
-            $table->unsignedInteger('signed_page');
-            $table->string('sign_location');
+            $table->longText('signed_file_data'); // Base64 or binary representation of signed PDF
             $table->timestamp('signed_at')->useCurrent();
-            $table->foreign('document_id')->references('id')->on('documents');
-            $table->foreign('signer_id')->references('id')->on('users');
-            $table->foreign('certificate_id')->references('cert_id')->on('certificates');
+            
+            $table->foreign('document_id')->references('id')->on('documents')->cascadeOnDelete();
+            $table->foreign('signer_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('certificate_id')->references('cert_id')->on('certificates')->cascadeOnDelete();
         });
     }
 

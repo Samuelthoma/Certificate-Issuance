@@ -80,7 +80,7 @@ export function makeDraggable(el) {
     el.style.top = `${newTop}px`;
     
     // Update stored position
-    import('./boxManager.js').then(module => {
+    import('./signatureBoxManager.js').then(module => {
       module.updateBoxPosition(el);
     });
   });

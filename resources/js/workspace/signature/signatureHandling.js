@@ -21,7 +21,7 @@ export function initSignatureHandling() {
 }
 
 // Handle double click on signature boxes
-function handleBoxDoubleClick(event) {
+async function handleBoxDoubleClick(event) {
   // Find if we clicked on a signature box or any of its children
   const box = findParentSignatureBox(event.target);
   
@@ -64,6 +64,60 @@ function handleBoxDoubleClick(event) {
       }
     }
   }
+
+  const documentId = document.body.dataset.documentId;
+    const token = sessionStorage.getItem("token");
+  
+    try {
+      const response = await fetch(`/api/documents/getCollaborators/${documentId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+      });
+      const result = await response.json();
+    
+      const collaboratorLists = document.querySelectorAll('.collaboratorList');
+      const assignToTexts = document.querySelectorAll('.assign-to');
+      const currentUserId = sessionStorage.getItem("user_id");
+
+      if (result.collaborators.length === 0) {
+          collaboratorLists.forEach(select => {
+              select.classList.add('hidden');
+          });
+          assignToTexts.forEach(text => {
+              text.textContent = "No collaborators available";
+          });
+      } else {
+          collaboratorLists.forEach(select => {
+              // Clear previous options
+              select.innerHTML = '';
+
+              const defaultOption = document.createElement('option');
+              defaultOption.value = currentUserId;
+              defaultOption.textContent = 'Owner';
+              select.appendChild(defaultOption);
+
+              // Add collaborators
+              result.collaborators.forEach(user => {
+                  const option = document.createElement('option');
+                  option.value = user.user_id;
+                  option.textContent = user.email;
+                  select.appendChild(option);
+              });
+          });
+
+          assignToTexts.forEach(text => {
+              text.textContent = "Assign to :";
+          });
+      }
+
+      if (!response.ok) throw new Error("Failed");
+    }catch (error) {
+    }
+
 }
 
 // Find the parent signature box of an element
@@ -202,7 +256,7 @@ function saveDrawnSignature() {
 }
 
 // Apply the signature to the signature box
-export function applySignatureToBox(boxId, signatureData, type) {
+export function applySignatureToBox(boxId, signatureData, type, userId) {
   // Find the box element
   const boxes = document.querySelectorAll('.signature-box');
   let targetBox = null;
@@ -216,6 +270,8 @@ export function applySignatureToBox(boxId, signatureData, type) {
   
   if (!targetBox) return;
   
+  targetBox.dataset.userId = userId;
+
   // Store the signature data
   if (!drawnSignatures[boxId]) {
     drawnSignatures[boxId] = {};
@@ -223,6 +279,7 @@ export function applySignatureToBox(boxId, signatureData, type) {
   
   // Determine status based on content
   let status = 'pending';
+  let targetUserId = userId;
   
   if (type === 'typed') {
     // For typed signatures, check if there's actual content
@@ -267,12 +324,12 @@ export function applySignatureToBox(boxId, signatureData, type) {
     signatureImg.src = signatureData;
     
     // Add a visual indicator of status
-    updateStatusIndicator(targetBox, status);
+    updateStatusIndicator(targetBox, status, targetUserId);
   }
 }
 
 // Update status indicator on box
-function updateStatusIndicator(box, status) {
+function updateStatusIndicator(box, status, targetUserId) {
   // Remove any existing status indicator
   const existingIndicator = box.querySelector('.status-indicator');
   if (existingIndicator) {
@@ -289,6 +346,7 @@ function updateStatusIndicator(box, status) {
   
   // Also update the data attribute for status
   box.dataset.status = status;
+  box.dataset.userId = targetUserId;
 }
 
 // Set up modal action buttons
@@ -312,17 +370,39 @@ function setupModalActions() {
       }
     });
   }
+
+  const cancelTypedBtn = document.getElementById('cancelTyped');
+  const TypedModal = document.getElementById("typedSignatureModal");
+
+  if (cancelTypedBtn) {
+    cancelTypedBtn.addEventListener('click', () => {
+      TypedModal.classList.add("hidden");
+      TypedModal.classList.remove("flex");
+    });
+  }
+
   
   // Apply drawn signature button
   const applyDrawnBtn = document.getElementById('applyDrawn');
   if (applyDrawnBtn) {
     applyDrawnBtn.addEventListener('click', () => {
       // Ensure we always have a value, even if canvas is empty
+      const selectedUserId = document.getElementById('selectCollaborator').value;
       const signatureData = isCanvasEmpty() ? '' : saveDrawnSignature();
       if (signatureData !== null) { // Check for null, but allow empty string
-        applySignatureToBox(currentBoxId, signatureData, 'drawn');
+        applySignatureToBox(currentBoxId, signatureData, 'drawn', selectedUserId);
         closeDrawnModal();
       }
+    });
+  }
+
+  const cancelDrawnBtn = document.getElementById('cancelDrawn');
+  const DrawnModal = document.getElementById("drawnSignatureModal");
+  
+  if (cancelDrawnBtn) {
+    cancelDrawnBtn.addEventListener('click', () => {
+      DrawnModal.classList.add("hidden");
+      DrawnModal.classList.remove("flex");
     });
   }
 }

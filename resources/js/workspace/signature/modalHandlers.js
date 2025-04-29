@@ -58,3 +58,31 @@ export function openDrawnModal() {
     modal.classList.add("flex");
   }
 }
+
+export function setupCollaboratorHandling() {
+  // Get all collaborator select dropdowns
+  const collaboratorSelects = document.querySelectorAll('.collaboratorList');
+  
+  collaboratorSelects.forEach(select => {
+    // Add change event listener
+    select.addEventListener('change', function() {
+      const selectedUserId = this.value;
+      const currentUserId = sessionStorage.getItem('user_id');
+      
+      // If user selects someone other than themselves
+      if (selectedUserId !== currentUserId) {
+        // Configure modal warning element
+        const warningElement = document.querySelector('.assignment-warning');
+        if (warningElement) {
+          warningElement.classList.remove('hidden');
+        }
+      } else {
+        // Hide warning if user selects themselves
+        const warningElement = document.querySelector('.assignment-warning');
+        if (warningElement) {
+          warningElement.classList.add('hidden');
+        }
+      }
+    });
+  });
+}

@@ -137,11 +137,16 @@
 
             <!-- Signature Modals -->
             <div id="typedSignatureModal" class="fixed inset-0 bg-black/70 items-center justify-center z-50 hidden">
-                <div class="bg-white p-6 rounded shadow-xl w-96">
+                <div class="bg-white p-8 rounded-sm shadow-xl w-96">
                     <h2 class="text-xl font-semibold mb-4">Type Your Signature</h2>
-                    <textarea id="typedInput" class="w-full border p-2 rounded mb-4" placeholder="Type your name..."></textarea>
+                    <input type="text" id="typedInput" class="w-full border p-2 rounded mb-4" placeholder="Type your name..."></input>
+                    <h2 class="text-xl font-semibold mb-4 assign-to">Loading... </h2>
+                    <select name="collaborator" class="mb-4 w-full collaboratorList"></select>
+                    <div class="assignment-warning hidden mt-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 rounded">
+                      <p>Warning: You are assigning this signature to another user. Once assigned, you won't be able to modify it.</p>
+                    </div>
                     <div class="flex justify-end space-x-2">
-                        <button class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
+                        <button id="cancelTyped" class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
                         <button id="applyTyped" class="px-4 py-2 bg-blue-500 text-white rounded">Apply</button>
                     </div>
                 </div>
@@ -150,13 +155,16 @@
             <div id="drawnSignatureModal" class="fixed inset-0 bg-black/70 items-center justify-center z-50 hidden">
                 <div class="bg-white p-6 rounded shadow-xl w-96">
                     <h2 class="text-xl font-semibold mb-4">Draw Your Signature</h2>
-                    <canvas id="drawCanvas" width="300" height="100" class="border mb-4"></canvas>
-                    <div class="flex justify-between mb-2">
-                        <button id="clearCanvas" class="px-3 py-1 bg-gray-200 rounded">Clear</button>
+                    <canvas id="drawCanvas" class="border mb-4 w-full"></canvas>
+                    <h2 class="text-xl font-semibold mb-4 assign-to">Loading... </h2>
+                    <select id="selectCollaborator" name="collaborator" class="mb-4 w-full collaboratorList border-2 rounded-sm"></select>
+                    <div class="assignment-warning hidden mt-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 rounded">
+                        <p>Warning: You are assigning this signature to another user. Once assigned, you won't be able to modify it.</p>
                     </div>
                     <div class="flex justify-end space-x-2">
-                        <button class="px-4 py-2 bg-gray-300 rounded modal-cancel">Cancel</button>
-                        <button id="applyDrawn" class="px-4 py-2 bg-blue-500 text-white rounded">Apply</button>
+                        <button id="clearCanvas" class="px-3 py-1 bg-red-200 rounded w-full">Clear</button>
+                        <button id="cancelDrawn" class="px-4 py-2 bg-gray-300 rounded modal-cancel w-full">Cancel</button>
+                        <button id="applyDrawn" class="px-4 py-2 bg-blue-500 text-white rounded w-full">Apply</button>
                     </div>
                 </div>
             </div>

@@ -2,49 +2,59 @@
 
 // Initialize modal handlers
 export function initModalHandlers() {
+  // Add event listeners for modal close buttons
+  document.addEventListener("DOMContentLoaded", function() {
     // Add event listeners for modal close buttons
-    document.addEventListener("DOMContentLoaded", function() {
-      // Add event listeners for modal close buttons
-      const cancelButtons = document.querySelectorAll("#typedSignatureModal button, #drawnSignatureModal button");
-      cancelButtons.forEach(button => {
-        if (button.textContent.includes("Cancel")) {
-          button.addEventListener("click", () => {
-            closeTypedModal();
-            closeDrawnModal();
-          });
-        }
-      });
+    const cancelButtons = document.querySelectorAll("#typedSignatureModal button, #drawnSignatureModal button");
+    cancelButtons.forEach(button => {
+      if (button.textContent.includes("Cancel")) {
+        button.addEventListener("click", () => {
+          closeTypedModal();
+          closeDrawnModal();
+        });
+      }
     });
+  });
+}
+
+// Close typed signature modal
+export function closeTypedModal() {
+  const modal = document.getElementById("typedSignatureModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
   }
+}
+
+// Close drawn signature modal
+export function closeDrawnModal() {
+  const modal = document.getElementById("drawnSignatureModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+// Open typed signature modal
+export function openTypedModal(boxId, existingValue = '') {
+  const modal = document.getElementById("typedSignatureModal");
+  const typedInput = document.getElementById("typedInput");
   
-  // Close typed signature modal
-  export function closeTypedModal() {
-    const modal = document.getElementById("typedSignatureModal");
-    if (modal) {
-      modal.classList.add("hidden");
-    }
-  }
+  // Set existing value if provided
+  typedInput.value = existingValue;
   
-  // Close drawn signature modal
-  export function closeDrawnModal() {
-    const modal = document.getElementById("drawnSignatureModal");
-    if (modal) {
-      modal.classList.add("hidden");
-    }
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    typedInput.focus();
   }
-  
-  // Open typed signature modal
-  export function openTypedModal() {
-    const modal = document.getElementById("typedSignatureModal");
-    if (modal) {
-      modal.classList.remove("hidden");
-    }
+}
+
+// Open drawn signature modal
+export function openDrawnModal() {
+  const modal = document.getElementById("drawnSignatureModal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
   }
-  
-  // Open drawn signature modal
-  export function openDrawnModal() {
-    const modal = document.getElementById("drawnSignatureModal");
-    if (modal) {
-      modal.classList.remove("hidden");
-    }
-  }
+}

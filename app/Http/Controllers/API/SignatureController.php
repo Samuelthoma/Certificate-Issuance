@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\Signature;
 use App\Models\SigningRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class SignatureController extends Controller
 {
@@ -30,6 +32,8 @@ class SignatureController extends Controller
             'signatures.*.rel_width' => 'required|numeric',
             'signatures.*.rel_height' => 'required|numeric',
             'signatures.*.type' => 'required|in:typed,drawn',
+            'signatures.*.status' => 'required|in:pending,active',
+            'signatures.*.user_id' => 'required|exists:users,id',
             'existing_ids' => 'array'
         ]);
 
@@ -49,8 +53,15 @@ class SignatureController extends Controller
             $signatures = $request->input('signatures');
             $existingIds = $request->input('existing_ids', []);
             
+            // Check document ownership
+            $document = Document::find($documentId);
+            $isDocumentOwner = $document && $document->user_id == $userId;
+            
             // Process each signature
             foreach ($signatures as $signatureData) {
+                // Ensure content is set, even if empty
+                $content = $signatureData['content'] ?? '';
+                
                 // Check if this is an update (has ID) or create (no ID)
                 if (!empty($signatureData['id'])) {
                     // Update existing signature
@@ -64,24 +75,28 @@ class SignatureController extends Controller
                             'rel_width' => $signatureData['rel_width'],
                             'rel_height' => $signatureData['rel_height'],
                             'type' => $signatureData['type'],
-                            'content' => $signatureData['content']
+                            'content' => $content,
+                            'status' => $signatureData['status'],
+                            'user_id' => $signatureData['user_id']
                         ]);
                     }
                 } else {
                     // Create new signature
                     $signature = Signature::create([
                         'document_id' => $documentId,
+                        'user_id' => $signatureData['user_id'],
                         'page' => $signatureData['page'],
                         'rel_x' => $signatureData['rel_x'],
                         'rel_y' => $signatureData['rel_y'],
                         'rel_width' => $signatureData['rel_width'],
                         'rel_height' => $signatureData['rel_height'],
                         'type' => $signatureData['type'],
-                        'content' => $signatureData['content']
+                        'content' => $content,
+                        'status' => $signatureData['status']
                     ]);
                     
                     // Create or update signing request if this is for another user
-                    if (!empty($signatureData['user_id']) && $signatureData['user_id'] != $userId) {
+                    if ($signatureData['user_id'] != $userId) {
                         SigningRequest::updateOrCreate(
                             [
                                 'document_id' => $documentId,
@@ -97,11 +112,17 @@ class SignatureController extends Controller
                 }
             }
             
-            // Delete signatures that no longer exist
-            if (!empty($existingIds)) {
-                Signature::where('document_id', $documentId)
-                    ->whereNotIn('id', $existingIds)
-                    ->delete();
+            // Delete signatures that no longer exist (only if user is document owner)
+            if ($isDocumentOwner && !empty($existingIds)) {
+                // Get all signature IDs for this document
+                $allDocSignatureIds = Signature::where('document_id', $documentId)->pluck('id')->toArray();
+                
+                // Find IDs that should be deleted (in document but not in existingIds)
+                $idsToDelete = array_diff($allDocSignatureIds, $existingIds);
+                
+                if (!empty($idsToDelete)) {
+                    Signature::whereIn('id', $idsToDelete)->delete();
+                }
             }
             
             DB::commit();
@@ -120,5 +141,48 @@ class SignatureController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Get signatures for a specific document
+     * 
+     * @param int $documentId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getSignatures($documentId)
+    {
+        // Make sure the document exists
+        $document = Document::find($documentId);
+        if (!$document) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Document not found'
+            ], 404);
+        }
+        
+        // Get all signatures for this document
+        $signatures = Signature::where('document_id', $documentId)->get();
+        
+        // Transform signatures to include necessary information
+        $signatureData = $signatures->map(function ($signature) {
+            return [
+                'id' => $signature->id,
+                'document_id' => $signature->document_id,
+                'user_id' => $signature->user_id,
+                'page' => $signature->page,
+                'rel_x' => $signature->rel_x,
+                'rel_y' => $signature->rel_y,
+                'rel_width' => $signature->rel_width,
+                'rel_height' => $signature->rel_height,
+                'type' => $signature->type,
+                'status' => $signature->status,
+                'content' => $signature->content,
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'signatures' => $signatureData
+        ]);
     }
 }

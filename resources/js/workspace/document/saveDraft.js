@@ -63,19 +63,31 @@ function collectSignatureData() {
   const signatures = [];
   const existingIds = [];
   
+  // Flag to check if user is the document owner - updated to use sessionStorage value
+  const isDocumentOwner = sessionStorage.getItem("isDocumentOwner") === "true";
+  
   // Process each page's signature boxes
   Object.entries(allBoxes).forEach(([page, boxes]) => {
     boxes.forEach(box => {
-      // Get the signature content
-      let content = null;
+      // Get the signature content and status
+      let content = '';  // Default to empty string to avoid undefined
+      let status = 'pending'; // Default status
+      
       if (drawnSignatures[box.id]) {
-        content = box.type === 'typed' ? 
-          drawnSignatures[box.id].typed : 
-          drawnSignatures[box.id].drawn;
+        if (box.type === 'typed') {
+          content = drawnSignatures[box.id].typed || '';
+        } else {
+          content = drawnSignatures[box.id].drawn || '';
+        }
+        
+        // Get the status from the drawnSignatures object
+        status = drawnSignatures[box.id].status || 'pending';
       }
       
-      // If there's a database ID already assigned (for updates)
-      let dbId = box.element?.dataset?.dbId || null;
+      // IMPORTANT FIX: Use the dbId property directly from the box object, not from the DOM element
+      // This ensures we always have the database ID even if the element reference is lost
+      let dbId = box.dbId || null;
+      
       if (dbId) {
         existingIds.push(dbId);
       }
@@ -89,19 +101,29 @@ function collectSignatureData() {
         rel_width: box.relWidth,
         rel_height: box.relHeight,
         type: box.type,
-        content: content,
+        content: content, // Always include content, even if empty
+        status: status, // Include the status
         box_id: box.id, // Frontend ID for reference
-        user_id: box.userId || userId // Use the box's user ID or current user
+        user_id: box.userId || userId // Use the box's user ID or current user as fallback
       });
     });
   });
   
-  return {
+  // If user is document owner, return all existing IDs to allow box deletion
+  // Otherwise, only return IDs for boxes the user can modify
+  const returnData = {
     document_id: documentId,
     user_id: userId,
-    signatures: signatures,
-    existing_ids: existingIds
+    signatures: signatures
   };
+  
+  // Only include existing_ids if the user is the document owner
+  // This controls who can delete signature boxes
+  if (isDocumentOwner && existingIds.length > 0) {
+    returnData.existing_ids = existingIds;
+  }
+  
+  return returnData;
 }
 
 /**

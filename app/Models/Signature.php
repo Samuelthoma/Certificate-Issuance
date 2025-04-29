@@ -11,18 +11,25 @@ class Signature extends Model
 
     protected $fillable = [
         'document_id',
+        'user_id',
         'page',
         'rel_x',
         'rel_y',
         'rel_width',
         'rel_height',
         'type',
+        'status',
         'content',
     ];
-
+    
     public function document()
     {
         return $this->belongsTo(Document::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function signingRequests()

@@ -11,13 +11,13 @@ class SignedDocument extends Model
 
     protected $fillable = [
         'document_id',
-        'signer_id',
+        'finalizer_id',
         'certificate_id',
         'signed_file_data',
         'signed_at',
     ];
 
-    public $timestamps = false; // signed_at is manually handled
+    public $timestamps = false;
 
     protected $casts = [
         'signed_at' => 'datetime',
@@ -28,9 +28,9 @@ class SignedDocument extends Model
         return $this->belongsTo(Document::class);
     }
 
-    public function signer()
+    public function finalizer()
     {
-        return $this->belongsTo(User::class, 'signer_id');
+        return $this->belongsTo(User::class, 'finalizer_id');
     }
 
     public function certificate()

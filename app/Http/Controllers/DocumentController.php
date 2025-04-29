@@ -200,6 +200,7 @@ class DocumentController extends Controller
                 'file_data' => $decryptedContent,
                 'file_owner' => $document->user->email,
                 'file_id' => $document->id,
+                'isOwner' => $user->id === $document->user_id
             ]);
         } catch (\Exception $e) {
             Log::error('Exception in document decryption', [
@@ -325,5 +326,6 @@ class DocumentController extends Controller
 
         return response()->json(['collaborators' => $collaborators->values()]);
     }
+    
 }
 

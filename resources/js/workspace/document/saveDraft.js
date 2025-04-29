@@ -1,7 +1,7 @@
 // signature/saveDraft.js - Handles saving signature boxes to the database
 
-import { getSignatureBoxes } from '../signature/boxManager.js';
-import { drawnSignatures } from '../signature/signatureHandling.js';
+import { getSignatureBoxes } from '../signature/signatureBoxManager.js';
+import { drawnSignatures } from '../signature/signatureStorage.js';
 
 /**
  * Initialize save draft button functionality

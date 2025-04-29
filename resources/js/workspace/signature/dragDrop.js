@@ -1,5 +1,5 @@
 // signature/dragDrop.js - Drag and drop functionality
-import { createSignatureBox } from './boxManager.js';
+import { addSignatureBox as createSignatureBox } from './signatureBoxManager.js';
 import { selectBox } from './eventHandlers.js';
 import { enterBoxDrawingMode } from './boxDrawing.js';
 

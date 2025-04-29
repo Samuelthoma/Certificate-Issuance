@@ -1,9 +1,4 @@
 // signature/utils.js - Utility functions
-
-// Generate a unique ID
-export function generateId() {
-    return crypto.randomUUID();
-  }
   
   // Check if point is inside element bounds
   export function isPointInElement(x, y, element) {

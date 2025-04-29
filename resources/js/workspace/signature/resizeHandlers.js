@@ -1,5 +1,5 @@
 // signature/resizeHandlers.js - Box resizing functionality
-import { updateBoxPosition } from './boxManager.js';
+import { updateBoxPosition } from './signatureBoxManager.js';
 import { setResizeMode } from './dragDrop.js';
 import { getSelectedBox, setSelectedBox } from './eventHandlers.js';
 

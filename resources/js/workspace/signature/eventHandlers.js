@@ -18,7 +18,7 @@ export function initEventHandlers() {
   
   // Handle window resize to update all box positions
   window.addEventListener("resize", () => {
-    import('./boxManager.js').then(module => {
+    import('./signatureBoxLoader.js').then(module => {
       module.loadBoxesForCurrentPage();
     });
   });

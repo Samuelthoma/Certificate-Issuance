@@ -1,5 +1,5 @@
 // signature/boxDrawing.js - Box drawing mode functionality
-import { createSignatureBox } from './boxManager.js';
+import { createSignatureBox } from './signatureBoxFactory.js';
 
 let overlay;
 let isDrawingBox = false; // Flag for box drawing mode

@@ -1,7 +1,8 @@
 // documentLoader.js - Handles document loading and API interactions
 import { renderPDF } from './pdfRenderer.js';
-import { getSignatureBoxes, setCurrentPage, handlePageChange } from '../signature/boxManager.js';
-import { drawnSignatures } from '../signature/signatureHandling.js';
+import { getSignatureBoxes} from '../signature/signatureBoxManager.js';
+import { handlePageChange} from '../signature/signatureBoxLoader.js';
+import { drawnSignatures } from '../signature/signatureStorage.js';
 
 async function loadDocument() {
   const documentId = document.body.dataset.documentId;

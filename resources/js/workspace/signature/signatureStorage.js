@@ -4,14 +4,13 @@
 export let drawnSignatures = {};
 
 // Store a signature in memory
-export function storeSignature(boxId, type, data, status, userId) {
+export function storeSignature(boxId, type, data, status) {
   if (!drawnSignatures[boxId]) {
     drawnSignatures[boxId] = {};
   }
   
   drawnSignatures[boxId][type] = data;
   drawnSignatures[boxId].status = status;
-  drawnSignatures[boxId].userId = userId;
   
   return drawnSignatures[boxId];
 }

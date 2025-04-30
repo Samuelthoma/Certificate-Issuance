@@ -23,7 +23,10 @@ export function addSignatureBox(type, left, top, width, height, targetUserId = n
     overlay = document.getElementById("canvasOverlay");
   }
 
-  const boxId = createSignatureBox(type, left, top, width, height, targetUserId, overlay);
+  // Ensure we use the provided userId or fall back to current user
+  const assignedUserId = targetUserId || sessionStorage.getItem("user_id");
+
+  const boxId = createSignatureBox(type, left, top, width, height, assignedUserId, overlay);
   
   // Store box in our tracking object
   if (!signatureBoxes[currentPage]) {
@@ -42,7 +45,7 @@ export function addSignatureBox(type, left, top, width, height, targetUserId = n
   // Store box data with user ID and status
   signatureBoxes[currentPage].push({
     id: boxId,
-    userId: targetUserId || sessionStorage.getItem("user_id"),
+    userId: assignedUserId,
     type,
     relX,
     relY,
@@ -83,6 +86,36 @@ export function updateBoxPosition(boxElement) {
   
   // Make sure status is preserved
   boxData.status = boxElement.dataset.status || "pending";
+  
+  // Make sure user ID is preserved when updating position
+  boxData.userId = boxElement.dataset.userId;
+}
+
+// Update box's assigned user ID
+export function updateBoxUserId(boxId, newUserId) {
+  const currentPage = getCurrentPage();
+  
+  if (!signatureBoxes[currentPage]) return;
+  
+  // Find the box data in our tracking object
+  const boxData = signatureBoxes[currentPage].find(box => box.id === boxId);
+  if (!boxData) return;
+  
+  // Update the userId in both the tracking object and the DOM element
+  boxData.userId = newUserId;
+  
+  // Update the DOM element if it exists
+  if (boxData.element) {
+    boxData.element.dataset.userId = newUserId;
+    
+    // Update any UI representation if needed
+    const userLabel = boxData.element.querySelector('.user-label');
+    if (userLabel) {
+      userLabel.textContent = `Assigned to: ${newUserId}`;
+    }
+  }
+  
+  console.log(`Box ${boxId} reassigned to user: ${newUserId} in data store`);
 }
 
 // Get signature boxes (for external use)

@@ -2,7 +2,7 @@
 
 import { resetDrawCanvas, isCanvasEmpty, saveDrawnSignature } from './canvasDrawing.js';
 import { closeTypedModal, closeDrawnModal } from './modalHandlers.js';
-import { applySignatureToBox, getCurrentBoxId } from './signatureBoxInteraction.js';
+import { applySignatureToBox, getCurrentBoxId, updateBoxUserId } from './signatureBoxInteraction.js';
 
 // Set up modal action buttons
 export function setupModalActions() {
@@ -13,19 +13,28 @@ export function setupModalActions() {
   }
   
   // Apply typed signature button
-  const applyTypedBtn = document.getElementById('applyTyped');
-  if (applyTypedBtn) {
-    applyTypedBtn.addEventListener('click', () => {
-      const typedInput = document.getElementById('typedInput');
-      if (typedInput) {
-        // Always provide a string value even if empty
-        const inputValue = typedInput.value || '';
-        const currentUserId = sessionStorage.getItem("user_id");
-        applySignatureToBox(getCurrentBoxId(), inputValue, 'typed', currentUserId);
-        closeTypedModal();
-      }
-    });
-  }
+const applyTypedBtn = document.getElementById('applyTyped');
+if (applyTypedBtn) {
+  applyTypedBtn.addEventListener('click', () => {
+    const typedInput = document.getElementById('typedInput');
+    const inputValue = typedInput ? typedInput.value || '' : '';
+
+    const selectCollaborator = document.getElementById('selectCollaboratorTyped');
+    const selectedUserId = selectCollaborator ? selectCollaborator.value : sessionStorage.getItem("user_id");
+    const currentUserId = sessionStorage.getItem("user_id");
+    const currentBoxId = getCurrentBoxId();
+
+    if (selectedUserId !== currentUserId) {
+      applySignatureToBox(currentBoxId, '', 'typed');
+      updateBoxUserId(currentBoxId, selectedUserId);
+      closeTypedModal();
+      return;
+    }
+
+    applySignatureToBox(currentBoxId, inputValue, 'typed');
+    closeTypedModal();
+  });
+}
 
   const cancelTypedBtn = document.getElementById('cancelTyped');
   const TypedModal = document.getElementById("typedSignatureModal");
@@ -41,12 +50,21 @@ export function setupModalActions() {
   const applyDrawnBtn = document.getElementById('applyDrawn');
   if (applyDrawnBtn) {
     applyDrawnBtn.addEventListener('click', () => {
-      // Ensure we always have a value, even if canvas is empty
-      const selectCollaborator = document.getElementById('selectCollaborator');
+      const selectCollaborator = document.getElementById('selectCollaboratorDrawn');
       const selectedUserId = selectCollaborator ? selectCollaborator.value : sessionStorage.getItem("user_id");
+      const currentUserId = sessionStorage.getItem("user_id");
+      const currentBoxId = getCurrentBoxId();
+  
+      if (selectedUserId !== currentUserId) {
+        applySignatureToBox(currentBoxId, '', 'drawn');
+        updateBoxUserId(currentBoxId, selectedUserId);
+        closeDrawnModal();
+        return;
+      }
+  
       const signatureData = isCanvasEmpty() ? '' : saveDrawnSignature();
-      if (signatureData !== null) { // Check for null, but allow empty string
-        applySignatureToBox(getCurrentBoxId(), signatureData, 'drawn', selectedUserId);
+      if (signatureData !== null) {
+        applySignatureToBox(currentBoxId, signatureData, 'drawn');
         closeDrawnModal();
       }
     });

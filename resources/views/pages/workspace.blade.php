@@ -141,7 +141,7 @@
                     <h2 class="text-xl font-semibold mb-4">Type Your Signature</h2>
                     <input type="text" id="typedInput" class="w-full border p-2 rounded mb-4" placeholder="Type your name..."></input>
                     <h2 class="text-xl font-semibold mb-4 assign-to">Loading... </h2>
-                    <select name="collaborator" class="mb-4 w-full collaboratorList"></select>
+                    <select id="selectCollaboratorTyped" name="collaborator" class="mb-4 w-full collaboratorList border-2 rounded-sm"></select>
                     <div class="assignment-warning hidden mt-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 rounded">
                       <p>Warning: You are assigning this signature to another user. Once assigned, you won't be able to modify it.</p>
                     </div>
@@ -157,7 +157,7 @@
                     <h2 class="text-xl font-semibold mb-4">Draw Your Signature</h2>
                     <canvas id="drawCanvas" class="border mb-4 w-full"></canvas>
                     <h2 class="text-xl font-semibold mb-4 assign-to">Loading... </h2>
-                    <select id="selectCollaborator" name="collaborator" class="mb-4 w-full collaboratorList border-2 rounded-sm"></select>
+                    <select id="selectCollaboratorDrawn" name="collaborator" class="mb-4 w-full collaboratorList border-2 rounded-sm"></select>
                     <div class="assignment-warning hidden mt-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 rounded">
                         <p>Warning: You are assigning this signature to another user. Once assigned, you won't be able to modify it.</p>
                     </div>

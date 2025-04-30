@@ -3,6 +3,7 @@
 import { openTypedModal, openDrawnModal, closeTypedModal, closeDrawnModal } from './modalHandlers.js';
 import { loadSignatureToCanvas, resetDrawCanvas, getHasDrawn, setHasDrawn } from './canvasDrawing.js';
 import { drawnSignatures, storeSignature } from './signatureStorage.js';
+import { updateBoxUserId as updateBoxInManager } from './signatureBoxManager.js';
 
 // Track which box is currently being edited
 let currentBoxId = null;
@@ -96,7 +97,7 @@ async function fetchCollaborators() {
             // Add collaborators
             result.collaborators.forEach(user => {
                 const option = document.createElement('option');
-                option.value = user.user_id;
+                option.value = user.id;
                 option.textContent = user.email;
                 select.appendChild(option);
             });
@@ -137,7 +138,7 @@ function findParentSignatureBox(element) {
 }
 
 // Apply the signature to the signature box
-export function applySignatureToBox(boxId, signatureData, type, userId) {
+export function applySignatureToBox(boxId, signatureData, type) {
   // Find the box element
   const boxes = document.querySelectorAll('.signature-box');
   let targetBox = null;
@@ -150,8 +151,7 @@ export function applySignatureToBox(boxId, signatureData, type, userId) {
   }
   
   if (!targetBox) return;
-  
-  targetBox.dataset.userId = userId;
+
 
   // Determine status based on content
   let status = 'pending';
@@ -163,7 +163,7 @@ export function applySignatureToBox(boxId, signatureData, type, userId) {
     }
     
     // Store the signature data
-    storeSignature(boxId, 'typed', signatureData, status, userId);
+    storeSignature(boxId, 'typed', signatureData, status);
     
     // Create or update signature content in the box
     let signatureContent = targetBox.querySelector('.signature-content');
@@ -178,14 +178,14 @@ export function applySignatureToBox(boxId, signatureData, type, userId) {
     signatureContent.style.fontFamily = 'cursive, sans-serif';
     
     // Add a visual indicator of status
-    updateStatusIndicator(targetBox, status, userId);
+    updateStatusIndicator(targetBox, status);
     
   } else if (type === 'drawn') {
     // For drawn signatures, use our hasDrawn flag
     status = getHasDrawn() ? 'active' : 'pending';
     
     // Store the signature data
-    storeSignature(boxId, 'drawn', signatureData, status, userId);
+    storeSignature(boxId, 'drawn', signatureData, status);
     
     // Create or update signature image in the box
     let signatureImg = targetBox.querySelector('.signature-img');
@@ -199,12 +199,12 @@ export function applySignatureToBox(boxId, signatureData, type, userId) {
     signatureImg.src = signatureData;
     
     // Add a visual indicator of status
-    updateStatusIndicator(targetBox, status, userId);
+    updateStatusIndicator(targetBox, status);
   }
 }
 
 // Update status indicator on box
-function updateStatusIndicator(box, status, userId) {
+function updateStatusIndicator(box, status) {
   // Remove any existing status indicator
   const existingIndicator = box.querySelector('.status-indicator');
   if (existingIndicator) {
@@ -221,8 +221,36 @@ function updateStatusIndicator(box, status, userId) {
   
   // Also update the data attribute for status
   box.dataset.status = status;
-  box.dataset.userId = userId;
 }
+
+// Update box's assigned user ID
+export function updateBoxUserId(boxId, newUserId) {
+  // First, update the DOM element
+  const box = document.querySelector(`.signature-box[data-box-id="${boxId}"]`);
+  if (box) {
+    // Update the existing user ID dataset field
+    box.dataset.userId = newUserId;
+
+    // Update user label if it exists
+    const label = box.querySelector('.user-label');
+    if (label) {
+      label.textContent = `Assigned to: ${newUserId}`;
+    } else {
+      // Create a label if it doesn't exist
+      const userLabel = document.createElement("div");
+      userLabel.className = "user-label absolute top-5 left-0 text-xs bg-blue-100 px-1 select-none";
+      userLabel.textContent = `Assigned to: ${newUserId}`;
+      box.appendChild(userLabel);
+    }
+
+    console.log(`Box ${boxId} reassigned to user: ${newUserId}`);
+    console.log(`Box ${boxId} dataset:`, box.dataset);
+  }
+
+  // Then, update the data in the manager
+  updateBoxInManager(boxId, newUserId);
+}
+
 
 // Get the current box ID
 export function getCurrentBoxId() {

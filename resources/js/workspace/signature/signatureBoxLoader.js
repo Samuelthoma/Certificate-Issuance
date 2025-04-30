@@ -3,8 +3,8 @@ import { makeDraggable } from './dragDrop.js';
 import { addResizeHandles } from './resizeHandlers.js';
 import { selectBox } from './eventHandlers.js';
 import { deleteSignatureBox } from './signatureBoxDeletion.js';
-import { getCurrentPage, getSignatureBoxes, getOverlay, setCurrentPage } from './signatureBoxManager.js';
-import {applySignatureToBox } from './signatureBoxInteraction.js';
+import { getCurrentPage, getSignatureBoxes, getOverlay, setCurrentPage, updateBoxUserId } from './signatureBoxManager.js';
+import { applySignatureToBox } from './signatureBoxInteraction.js';
 
 // Function to handle page change
 export function handlePageChange(newPage) {
@@ -47,6 +47,9 @@ export function loadBoxesForCurrentPage() {
     signatureBoxes[currentPage].forEach(boxData => {
       const { type, relX, relY, relWidth, relHeight, id, userId, status } = boxData;
       
+      // Use the stored userId from boxData, NOT the current user's ID
+      const assignedUserId = userId || sessionStorage.getItem("user_id");
+      
       // Convert relative positions to absolute
       const left = relX * overlay.clientWidth;
       const top = relY * overlay.clientHeight;
@@ -58,13 +61,15 @@ export function loadBoxesForCurrentPage() {
       box.className = "signature-box absolute border-2 border-gray-400 bg-white bg-opacity-50 cursor-move";
       box.dataset.type = type;
       box.dataset.boxId = id;
-      box.dataset.userId = userId; // Add user ID to the element's dataset
+      box.dataset.userId = assignedUserId; // Use the box's stored userId
       box.dataset.status = status || "pending"; // Add status to the element's dataset with default
       box.style.left = `${left}px`;
       box.style.top = `${top}px`;
       box.style.width = `${width}px`;
       box.style.height = `${height}px`;
-      
+      console.log(`Loading box with userId:`, assignedUserId);
+      console.log(`Box dataset:`, box.dataset);
+
       // Add label
       const label = document.createElement("div");
       label.className = "absolute top-0 left-0 text-xs bg-gray-100 px-1 select-none";
@@ -72,6 +77,12 @@ export function loadBoxesForCurrentPage() {
         ? '<i class="fas fa-font mr-1"></i>Typed' 
         : '<i class="fas fa-signature mr-1"></i>Drawn';
       box.appendChild(label);
+      
+      // Add user label to visually indicate assigned user
+      const userLabel = document.createElement("div");
+      userLabel.className = "user-label absolute top-5 left-0 text-xs bg-blue-100 px-1 select-none";
+      userLabel.textContent = `Assigned: ${assignedUserId}`;
+      box.appendChild(userLabel);
       
       // Add status indicator
       const statusClass = status === "active" ? "bg-green-500 text-white" : "bg-yellow-500 text-black";
@@ -112,7 +123,7 @@ export function loadBoxesForCurrentPage() {
 
       // Restore dbId to DOM element
       if (boxData.dbId) {
-        box.dbId = boxData.dbId;
+        box.dataset.dbId = boxData.dbId;
       }
       
       // Initialize drawnSignatures entry if not exists

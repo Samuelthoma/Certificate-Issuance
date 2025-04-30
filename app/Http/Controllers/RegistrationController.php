@@ -103,6 +103,7 @@ class RegistrationController extends Controller
             session()->forget('registration_data');
     
             DB::commit();
+            session()->flush();
     
             return response()->json([
                 'success' => true,

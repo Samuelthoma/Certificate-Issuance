@@ -24,5 +24,10 @@
             <button id="submitButton" class="w-full bg-black text-white py-2 rounded" type="button">Submit</button>
         </div>
     </form>
+    <!-- Full-page transparent dark overlay with spinner -->
+    <div id="spinner" class="hidden fixed inset-0 bg-opacity-30 backdrop-blur-sm justify-center items-center z-50">
+        <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
     @vite('resources/js/register/ocr-form.js')
 @endsection

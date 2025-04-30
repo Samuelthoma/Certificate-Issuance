@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("id_card_image", fileInput.files[0]); // Ensure field name matches API
     
             try {
+
+                document.getElementById("spinner").classList.remove("hidden");
+                document.getElementById("spinner").classList.add("flex");
                 const response = await fetch("/api/extract-nik", {
                     method: "POST",
                     body: formData,
@@ -106,8 +109,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     sessionStorage.setItem("ocr_name", result.name);
                     sessionStorage.setItem("ocr_dob", reverseDateFormat(result.dob));
 
-
-    
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -140,6 +141,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     showConfirmButton: false,
                     timer: 3000,
                 });
+            } finally {
+                document.getElementById("spinner").classList.add("hidden");
+                document.getElementById("spinner").classList.remove("flex");
             }
         });
     }

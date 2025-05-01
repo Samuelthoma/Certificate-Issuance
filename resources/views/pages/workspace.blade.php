@@ -173,7 +173,7 @@
             <label class="font-bold">Recipients</label>
             <div class="flex border-2 font-semibold my-4 ">
                 <input type="email" id="collaborator-email" class="w-5/6 focus:outline-none py-2 px-2" placeholder="Add Recipient" name="email"/>
-                <button id="add-collaborator-btn" class="w-1/6 border-l-2 hover:bg-gray-200"><i class="fas fa-user"></i></button>
+                <button id="add-collaborator-btn" class="w-1/6 border-l-2 hover:bg-gray-200"><i class="fas fa-plus"></i></button>
             </div>
 
             <label class="font-bold">Collaborators</label>

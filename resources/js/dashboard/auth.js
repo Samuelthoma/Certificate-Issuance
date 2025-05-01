@@ -40,6 +40,7 @@ function setupLogout() {
         });
 
         sessionStorage.removeItem("token");
+        sessionStorage.clear();
         window.location.href = "/login";
     });
 }

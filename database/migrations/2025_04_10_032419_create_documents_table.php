@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('file_size');
             $table->longText('encrypted_file_data');
             $table->enum('version_type', ['original', 'signed', 'duplicate'])->default('original');
+            $table->enum('status', ['draft', 'pending', 'finalize', 'revoked'])->default('draft');
             $table->uuid('parent_document_id')->nullable();
             $table->string('iv');
             $table->timestamp('created_at')->useCurrent();

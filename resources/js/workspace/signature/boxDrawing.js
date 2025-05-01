@@ -1,5 +1,5 @@
 // signature/boxDrawing.js - Box drawing mode functionality
-import { createSignatureBox } from './signatureBoxFactory.js';
+import { addSignatureBox } from './signatureBoxManager.js';
 
 let overlay;
 let isDrawingBox = false; // Flag for box drawing mode
@@ -99,7 +99,8 @@ function handleDrawingEnd(e) {
   
   // Only create box if it has meaningful dimensions (at least 20x20)
   if (width > 20 && height > 20) {
-    createSignatureBox(type, left, top, width, height);
+    // Use addSignatureBox from signatureBoxManager.js instead of createSignatureBox
+    addSignatureBox(type, left, top, width, height);
   }
 }
 

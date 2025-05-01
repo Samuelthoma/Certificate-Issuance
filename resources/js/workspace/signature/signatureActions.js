@@ -20,8 +20,8 @@ if (applyTypedBtn) {
     const inputValue = typedInput ? typedInput.value || '' : '';
 
     const selectCollaborator = document.getElementById('selectCollaboratorTyped');
-    const selectedUserId = selectCollaborator ? selectCollaborator.value : sessionStorage.getItem("user_id");
-    const currentUserId = sessionStorage.getItem("user_id");
+    const selectedUserId = (selectCollaborator && selectCollaborator.value) || sessionStorage.getItem("user_id") || '';
+    const currentUserId = sessionStorage.getItem("user_id") || '';    
     const currentBoxId = getCurrentBoxId();
 
     if (selectedUserId !== currentUserId) {
@@ -51,11 +51,12 @@ if (applyTypedBtn) {
   if (applyDrawnBtn) {
     applyDrawnBtn.addEventListener('click', () => {
       const selectCollaborator = document.getElementById('selectCollaboratorDrawn');
-      const selectedUserId = selectCollaborator ? selectCollaborator.value : sessionStorage.getItem("user_id");
-      const currentUserId = sessionStorage.getItem("user_id");
+      const selectedUserId = (selectCollaborator && selectCollaborator.value) || sessionStorage.getItem("user_id") || '';
+      const currentUserId = sessionStorage.getItem("user_id") || '';      
       const currentBoxId = getCurrentBoxId();
   
       if (selectedUserId !== currentUserId) {
+        console.log("user id assigning triggered");
         applySignatureToBox(currentBoxId, '', 'drawn');
         updateBoxUserId(currentBoxId, selectedUserId);
         closeDrawnModal();
@@ -64,6 +65,7 @@ if (applyTypedBtn) {
   
       const signatureData = isCanvasEmpty() ? '' : saveDrawnSignature();
       if (signatureData !== null) {
+        console.log("user id assigning triggered");
         applySignatureToBox(currentBoxId, signatureData, 'drawn');
         closeDrawnModal();
       }

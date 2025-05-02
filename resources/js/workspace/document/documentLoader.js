@@ -44,7 +44,7 @@ async function loadDocument() {
     // Store the isOwner value in sessionStorage for use in other components
     sessionStorage.setItem("isDocumentOwner", isOwner);
     // Store the status in sessionStorage
-    sessionStorage.setItem("documentStatus", status || "draft");
+    sessionStorage.setItem("documentStatus", status);
 
     if (file_type === "application/pdf" && file_data) {
       await renderPDF(file_data);
@@ -144,10 +144,10 @@ function initializeSignatureData(signatures) {
       relY: parseFloat(signature.rel_y),
       relWidth: parseFloat(signature.rel_width),
       relHeight: parseFloat(signature.rel_height),
-      status: signature.status || "pending",
+      status: signature.status || "active",
       // Element will be set when loaded in boxManager
     };
-    
+    console.log(signature.status);
     // Add to page collection
     signaturesByPage[page].push(boxData);
     

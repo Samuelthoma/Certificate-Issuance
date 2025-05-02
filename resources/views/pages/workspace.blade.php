@@ -119,8 +119,13 @@
                 <i class="fas fa-save mr-2"></i>Save Draft
             </button>
 
+            <label class="font-bold">Send</label>
+            <button id="send-document-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                <i class="fas fa-paper-plane mr-2"></i>Send Document
+            </button>
+
             <label class="font-bold">Finalize</label>
-            <button id="save-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+            <button id="finalize-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
                 <i class="fas fa-check-circle mr-2"></i>Finalize Document
             </button>
         </div>

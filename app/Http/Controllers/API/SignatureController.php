@@ -49,7 +49,7 @@ class SignatureController extends Controller
             DB::beginTransaction();
             
             $documentId = $request->input('document_id');
-            $userId = auth()->user();
+            $userId = $request->input('user_id');
             $signatures = $request->input('signatures');
             $existingIds = $request->input('existing_ids', []);
             

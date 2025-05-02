@@ -46,8 +46,10 @@ export async function handleBoxDoubleClick(event) {
     resetDrawCanvas();
     if (drawnSignatures[currentBoxId]?.drawn) {
       loadSignatureToCanvas(drawnSignatures[currentBoxId].drawn);
-      // If we're loading a previous signature, consider it as drawn
-      if (drawnSignatures[currentBoxId].status === 'active') {
+      
+      // FIX: Always set hasDrawn to true if there's existing signature data
+      // This ensures we don't accidentally change status from active to pending
+      if (drawnSignatures[currentBoxId].drawn.length > 22) { // More than empty data URL
         setHasDrawn(true);
       }
     }
@@ -152,7 +154,6 @@ export function applySignatureToBox(boxId, signatureData, type) {
   
   if (!targetBox) return;
 
-
   // Determine status based on content
   let status = 'pending';
   
@@ -181,8 +182,10 @@ export function applySignatureToBox(boxId, signatureData, type) {
     updateStatusIndicator(targetBox, status);
     
   } else if (type === 'drawn') {
-    // For drawn signatures, use our hasDrawn flag
-    status = getHasDrawn() ? 'active' : 'pending';
+    // FIX: For drawn signatures, check both hasDrawn flag AND if there's valid signature data
+    // This prevents the bug where opening an existing signature without drawing would mark it as pending
+    const hasValidSignature = signatureData && signatureData.length > 22; // More than empty data URL
+    status = (getHasDrawn() || hasValidSignature) ? 'active' : 'pending';
     
     // Store the signature data
     storeSignature(boxId, 'drawn', signatureData, status);

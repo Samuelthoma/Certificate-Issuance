@@ -5,6 +5,7 @@ import { initDownloadButton } from './documentDownloader.js';
 import { initPaginationControls, initZoomControls } from './uiControls.js';
 import { secureCanvas, initContextMenuProtection } from './securityUtils.js';
 import { initializePermissions } from './documentPermissions.js'; 
+import { initPermissionsUI } from './permissionsUI.js';
 import saveDraftHandler from './saveDraft.js';
 
 async function initializeDocument() {
@@ -17,11 +18,15 @@ async function initializeDocument() {
     const status = sessionStorage.getItem("documentStatus") || "draft";
     initializePermissions(status, isOwner);
     
+    // Initialize UI controls
     initPaginationControls();
     initZoomControls();
     initDownloadButton();
     secureCanvas();
     initContextMenuProtection();
+    
+    // Initialize permission-based UI
+    initPermissionsUI();
     
     // Initialize save draft functionality
     saveDraftHandler.init();

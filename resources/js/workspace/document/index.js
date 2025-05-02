@@ -1,14 +1,21 @@
 // document/index.js - Main entry point for document functionality
 import { renderPDFPage, getCurrentPage } from './pdfRenderer.js';
-import { loadDocument, initDownloadButton } from './documentLoader.js';
+import { loadDocument } from './documentLoader.js';
+import { initDownloadButton } from './documentDownloader.js';
 import { initPaginationControls, initZoomControls } from './uiControls.js';
 import { secureCanvas, initContextMenuProtection } from './securityUtils.js';
+import { initializePermissions } from './documentPermissions.js'; 
 import saveDraftHandler from './saveDraft.js';
 
 async function initializeDocument() {
   try {
     const documentData = await loadDocument();
     if (!documentData) return false;
+    
+    // Initialize document permissions
+    const isOwner = sessionStorage.getItem("isDocumentOwner") === "true";
+    const status = sessionStorage.getItem("documentStatus") || "draft";
+    initializePermissions(status, isOwner);
     
     initPaginationControls();
     initZoomControls();

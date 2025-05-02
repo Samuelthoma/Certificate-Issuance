@@ -95,6 +95,8 @@ class SignatureController extends Controller
                         'status' => $signatureData['status']
                     ]);
                     
+                    $existingIds[] = $signature->id; 
+
                     // Create or update signing request if this is for another user
                     if ($signatureData['user_id'] != $userId) {
                         SigningRequest::updateOrCreate(

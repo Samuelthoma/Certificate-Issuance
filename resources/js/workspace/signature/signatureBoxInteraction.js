@@ -47,7 +47,6 @@ export async function handleBoxDoubleClick(event) {
     if (drawnSignatures[currentBoxId]?.drawn) {
       loadSignatureToCanvas(drawnSignatures[currentBoxId].drawn);
       
-      // FIX: Always set hasDrawn to true if there's existing signature data
       // This ensures we don't accidentally change status from active to pending
       if (drawnSignatures[currentBoxId].drawn.length > 22) { // More than empty data URL
         setHasDrawn(true);
@@ -63,6 +62,7 @@ export async function handleBoxDoubleClick(event) {
 async function fetchCollaborators() {
   const documentId = document.body.dataset.documentId;
   const token = sessionStorage.getItem("token");
+  const permissions = getPermissions();
 
   try {
     const response = await fetch(`/api/documents/getCollaborators/${documentId}`, {

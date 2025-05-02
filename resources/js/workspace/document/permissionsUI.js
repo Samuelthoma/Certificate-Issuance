@@ -42,7 +42,7 @@ function updateDraftUI(permissions) {
     saveDraftBtn.classList.toggle('opacity-50', !permissions.canSaveDraft);
     saveDraftBtn.classList.toggle('cursor-not-allowed', !permissions.canSaveDraft);
   }
-  
+
   // Handle Send Document button
   const sendDocumentBtn = document.getElementById('send-document-btn');
   if (sendDocumentBtn) {
@@ -50,33 +50,26 @@ function updateDraftUI(permissions) {
     sendDocumentBtn.classList.toggle('opacity-50', !permissions.canSendDocument);
     sendDocumentBtn.classList.toggle('cursor-not-allowed', !permissions.canSendDocument);
   }
-  
-  // Handle Finalize Document button (hide if not allowed)
+
+  // Handle Finalize Document button
   const finalizeBtn = document.getElementById('finalize-btn');
   if (finalizeBtn) {
-    if (!permissions.canFinalizeDocument) {
-      finalizeBtn.style.display = 'none';
-    } else {
-      finalizeBtn.style.display = 'block';
-    }
+    finalizeBtn.style.display = permissions.canFinalizeDocument ? 'block' : 'none';
   }
-  
+
   // Handle Add Collaborator functionality
   const addCollaboratorBtn = document.getElementById('add-collaborator-btn');
   const collaboratorEmail = document.getElementById('collaborator-email');
   if (addCollaboratorBtn && collaboratorEmail) {
     addCollaboratorBtn.disabled = !permissions.canAddCollaborators;
     collaboratorEmail.disabled = !permissions.canAddCollaborators;
-    
-    if (!permissions.canAddCollaborators) {
-      addCollaboratorBtn.classList.add('opacity-50', 'cursor-not-allowed');
-      collaboratorEmail.classList.add('opacity-50', 'cursor-not-allowed');
-    } else {
-      addCollaboratorBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-      collaboratorEmail.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
+
+    addCollaboratorBtn.classList.toggle('opacity-50', !permissions.canAddCollaborators);
+    addCollaboratorBtn.classList.toggle('cursor-not-allowed', !permissions.canAddCollaborators);
+    collaboratorEmail.classList.toggle('opacity-50', !permissions.canAddCollaborators);
+    collaboratorEmail.classList.toggle('cursor-not-allowed', !permissions.canAddCollaborators);
   }
-  
+
   // Handle signature field modification permissions
   const signatureElements = document.querySelectorAll('.signature-toolbar-item');
   signatureElements.forEach(element => {
@@ -84,7 +77,23 @@ function updateDraftUI(permissions) {
     element.classList.toggle('opacity-50', !permissions.canModifySignatureFields);
     element.classList.toggle('cursor-not-allowed', !permissions.canModifySignatureFields);
   });
+
+  // Disable typed input and canvas if signing is not allowed
+  const typedInput = document.getElementById('typedInput');
+  if (typedInput) {
+    typedInput.disabled = !permissions.canSign;
+    typedInput.classList.toggle('opacity-50', !permissions.canSign);
+    typedInput.classList.toggle('cursor-not-allowed', !permissions.canSign);
+  }
+
+  const drawCanvas = document.getElementById('drawCanvas');
+  if (drawCanvas) {
+    drawCanvas.classList.toggle('pointer-events-none', !permissions.canSign);
+    drawCanvas.classList.toggle('opacity-50', !permissions.canSign);
+    drawCanvas.classList.toggle('cursor-not-allowed', !permissions.canSign);
+  }
 }
+
 
 /**
  * Updates UI elements for documents in pending status

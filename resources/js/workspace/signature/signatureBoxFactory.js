@@ -4,6 +4,8 @@ import { addResizeHandles } from './resizeHandlers.js';
 import { selectBox } from './eventHandlers.js';
 import { drawnSignatures } from './signatureStorage.js';
 import { deleteSignatureBox } from './signatureBoxDeletion.js';
+import { getPermissions } from '../document/documentPermissions.js';
+
 
 // Create a signature box at specified position with dimensions
 export function createSignatureBox(type, left, top, width, height, targetUserId = null, overlay) {
@@ -12,6 +14,7 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
   
   // Get the current user ID from session storage
   const currentUserId = sessionStorage.getItem("user_id");
+  const permissions = getPermissions();
   // Use the provided targetUserId or default to current user
   const userId = targetUserId || currentUserId;
   
@@ -41,7 +44,9 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
   box.appendChild(statusIndicator);
   
   // Add resize handles
-  addResizeHandles(box);
+  if(permissions.canResizeSignature){
+    addResizeHandles(box);
+  }
   
   // Add delete button
   const deleteBtn = document.createElement("div");
@@ -52,9 +57,12 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
     deleteSignatureBox(box);
   });
   box.appendChild(deleteBtn);
-  
+
   // Add event listeners for dragging
-  makeDraggable(box);
+  if (permissions.canMoveSignatureField) {
+    makeDraggable(box);
+  }
+  
   
   // Add click event for selection
   box.addEventListener("click", (e) => {

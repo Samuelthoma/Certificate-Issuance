@@ -5,6 +5,7 @@ import { selectBox } from './eventHandlers.js';
 import { deleteSignatureBox } from './signatureBoxDeletion.js';
 import { getCurrentPage, getSignatureBoxes, getOverlay, setCurrentPage, updateBoxUserId } from './signatureBoxManager.js';
 import { applySignatureToBox } from './signatureBoxInteraction.js';
+import { getPermissions } from '../document/documentPermissions.js';
 
 // Function to handle page change
 export function handlePageChange(newPage) {
@@ -49,6 +50,7 @@ export function loadBoxesForCurrentPage() {
       
       // Use the stored userId from boxData, NOT the current user's ID
       const assignedUserId = userId || sessionStorage.getItem("user_id");
+      const permissions = getPermissions();
       
       // Convert relative positions to absolute
       const left = relX * overlay.clientWidth;
@@ -94,7 +96,9 @@ export function loadBoxesForCurrentPage() {
       box.appendChild(statusIndicator);
       
       // Add resize handles
-      addResizeHandles(box);
+      if(permissions.canResizeSignature){
+        addResizeHandles(box);
+      }
       
       // Add delete button
       const deleteBtn = document.createElement("div");
@@ -107,7 +111,9 @@ export function loadBoxesForCurrentPage() {
       box.appendChild(deleteBtn);
       
       // Add event listeners for dragging
-      makeDraggable(box);
+      if (permissions.canMoveSignatureField) {
+        makeDraggable(box);
+      }
       
       // Add click event for selection
       box.addEventListener("click", (e) => {

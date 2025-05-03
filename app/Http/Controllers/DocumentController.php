@@ -345,5 +345,27 @@ class DocumentController extends Controller
             return response()->json(['message' => 'Failed to send document.'], 500);
         }
     }
+
+    public function removeCollaborator($id, $userId)
+    {
+        $user = Auth::user();
+        $document = Document::findOrFail($id);
+        if($user->id !== $document->user_id){
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $documentAccess = DocumentAccess::where('document_id', $id)->where('user_id', $userId)->first();
+
+        if (!$documentAccess) {
+            return response()->json(['message' => 'Document not found or unauthorized.'], 404);
+        }
+
+        try {
+            $documentAccess->delete();
+            return response()->json(['message' => 'Collaborator removed successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete collaborator.'], 500);
+        }
+    }
 }
 

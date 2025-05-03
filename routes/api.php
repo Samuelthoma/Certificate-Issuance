@@ -45,6 +45,8 @@ Route::middleware('auth:api')->post('/documents/{id}/collaborators', [DocumentCo
 
 Route::middleware('auth:api')->post('/documents/getCollaborators/{documentId}', [DocumentController::class, 'getCollaborators']);
 
+Route::middleware('auth:api')->delete('/documents/{id}/removeCollaborator/{userId}', [DocumentController::class, 'removeCollaborator']);
+
 Route::post('/signatures/save-draft', [SignatureController::class, 'saveDraft']);
 
 Route::middleware('auth:api')->post('/documents/{id}/send', [DocumentController::class, 'sendDocument']);

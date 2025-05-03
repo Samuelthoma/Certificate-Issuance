@@ -216,6 +216,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
         $documents = Document::where('user_id', $user->id)
+                     ->where('version_type', 'duplicate')
                      ->orderBy('created_at', 'desc')
                      ->get();
 

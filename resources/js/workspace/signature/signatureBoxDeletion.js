@@ -1,6 +1,7 @@
 // signature/signatureBoxDeletion.js - Handles deletion of signature boxes
 import { drawnSignatures } from './signatureStorage.js';
 import { getCurrentPage, getSignatureBoxes } from './signatureBoxManager.js';
+import { getPermissions } from '../document/documentPermissions.js';
 
 // Delete a signature box
 export function deleteSignatureBox(box) {
@@ -8,12 +9,16 @@ export function deleteSignatureBox(box) {
   const currentPage = getCurrentPage();
   const signatureBoxes = getSignatureBoxes();
   
+  const permissions = getPermissions();
   // Check if user is allowed to delete this box (only document owner can delete)
   const isOwner = sessionStorage.getItem("isDocumentOwner") === "true";
   
   // If current user is not the document owner, show an error and prevent deletion
   if (!isOwner) {
     showDeleteErrorMessage("Only the document owner can delete signature fields");
+    return;
+  }else if (!permissions.canModifySignatureFields) {
+    showDeleteErrorMessage("You can't delete signature fields at this stage");
     return;
   }
   

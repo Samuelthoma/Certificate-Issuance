@@ -111,7 +111,7 @@ export function loadBoxesForCurrentPage() {
       box.appendChild(deleteBtn);
       
       // Add event listeners for dragging
-      if (permissions.canMoveSignatureField) {
+      if (permissions.canMoveSignature) {
         makeDraggable(box);
       }
       

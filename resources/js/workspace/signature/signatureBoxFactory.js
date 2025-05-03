@@ -49,17 +49,19 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
   }
   
   // Add delete button
-  const deleteBtn = document.createElement("div");
-  deleteBtn.className = "absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer";
-  deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-  deleteBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    deleteSignatureBox(box);
-  });
-  box.appendChild(deleteBtn);
+  if (permissions.canModifySignatureFields) {
+    const deleteBtn = document.createElement("div");
+    deleteBtn.className = "absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer deleteBtn";
+    deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteSignatureBox(box);
+    });
+    box.appendChild(deleteBtn);
+  }
 
   // Add event listeners for dragging
-  if (permissions.canMoveSignatureField) {
+  if (permissions.canMoveSignature) {
     makeDraggable(box);
   }
   

@@ -114,11 +114,13 @@
                 <i class="fas fa-download mr-2"></i>Download File
             </button>
 
-            <label class="font-bold">Save</label>
-            <button id="save-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
-                <i class="fas fa-save mr-2"></i>Save Draft
-            </button>
-
+            <div id="save-btn-container">
+                <label class="font-bold">Save</label>
+                <button id="save-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                    <i class="fas fa-save mr-2"></i>Save Draft
+                </button>
+            </div>
+            
             <label class="font-bold">Send</label>
             <button id="send-document-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
                 <i class="fas fa-paper-plane mr-2"></i>Send Document
@@ -133,7 +135,7 @@
 
             <label class="font-bold">Response</label>
             <div class="flex gap-2.5 my-4">
-                <div id="send-btn" class="flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center">
+                <div id="sign-btn" class="flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center">
                     <i class="fas fa-pen-nib mr-2"></i>Sign Document
                 </div>
 

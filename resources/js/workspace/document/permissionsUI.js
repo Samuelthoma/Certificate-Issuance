@@ -92,6 +92,20 @@ function updateDraftUI(permissions) {
     drawCanvas.classList.toggle('opacity-50', !permissions.canSign);
     drawCanvas.classList.toggle('cursor-not-allowed', !permissions.canSign);
   }
+
+  const signButton = document.getElementById('sign-btn');
+  if (signButton) {
+    signButton.disabled = !permissions.canSign;
+    signButton.classList.toggle('opacity-50', !permissions.canSign);
+    signButton.classList.toggle('cursor-not-allowed', !permissions.canSign);
+    signButton.classList.remove('w-1/2');
+    signButton.classList.add('w-full');
+  }
+
+  const rejectButton = document.getElementById('reject-btn');
+  if (rejectButton) {
+    rejectButton.style.display = permissions.canRejectDocument ? 'block' : 'none';
+  }
 }
 
 
@@ -100,10 +114,9 @@ function updateDraftUI(permissions) {
  * @param {Object} permissions - Object containing permission flags
  */
 function updatePendingUI(permissions) {
-  const saveDraftBtn = document.getElementById('save-btn');
+  const saveDraftBtn = document.getElementById('save-btn-container');
   if (saveDraftBtn) {
-    saveDraftBtn.disabled = true;
-    saveDraftBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    saveDraftBtn.style.display = 'none';
   }
 
   const sendDocumentBtn = document.getElementById('send-document-btn');
@@ -143,6 +156,28 @@ function updatePendingUI(permissions) {
     typedInput.disabled = !permissions.canSign;
     typedInput.classList.toggle('opacity-50', !permissions.canSign);
     typedInput.classList.toggle('cursor-not-allowed', !permissions.canSign);
+  }
+
+  const signatureBoxes = document.querySelectorAll('.signature-box');
+  signatureBoxes.forEach(box => {
+    const deleteBtn = box.querySelector('.deleteBtn');
+    if (deleteBtn) {
+      deleteBtn.style.display = permissions.canModifySignatureFields ? 'inline-block' : 'none';
+    }
+  });
+
+  const signButton = document.getElementById('sign-btn');
+  if (signButton) {
+    signButton.disabled = !permissions.canSign;
+    signButton.classList.toggle('opacity-50', !permissions.canSign);
+    signButton.classList.toggle('cursor-not-allowed', !permissions.canSign);
+    signButton.classList.remove('w-1/2');
+    signButton.classList.add('w-full');
+  }
+
+  const rejectButton = document.getElementById('reject-btn');
+  if (rejectButton) {
+    rejectButton.style.display = permissions.canRejectDocument ? 'block' : 'none';
   }
 }
 

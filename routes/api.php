@@ -47,5 +47,7 @@ Route::middleware('auth:api')->post('/documents/getCollaborators/{documentId}', 
 
 Route::post('/signatures/save-draft', [SignatureController::class, 'saveDraft']);
 
+Route::middleware('auth:api')->post('/documents/{id}/send', [DocumentController::class, 'sendDocument']);
+
 Route::get('/signatures/{document_id}', [SignatureController::class, 'getSignatures']);
 

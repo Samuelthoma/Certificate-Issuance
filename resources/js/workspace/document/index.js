@@ -7,6 +7,7 @@ import { secureCanvas, initContextMenuProtection } from './securityUtils.js';
 import { initializePermissions } from './documentPermissions.js'; 
 import { initPermissionsUI } from './permissionsUI.js';
 import saveDraftHandler from './saveDraft.js';
+import { sendDocument } from './sendDocument.js';
 
 async function initializeDocument() {
   try {
@@ -30,6 +31,7 @@ async function initializeDocument() {
     
     // Initialize save draft functionality
     saveDraftHandler.init();
+    sendDocument();
     
     return true;
   } catch (err) {

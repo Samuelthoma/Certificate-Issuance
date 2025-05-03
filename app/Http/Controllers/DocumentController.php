@@ -327,6 +327,23 @@ class DocumentController extends Controller
 
         return response()->json(['collaborators' => $collaborators->values()]);
     }
-    
+
+    public function sendDocument($id){
+        $user = Auth::user();
+        $document = Document::where('id', $id)->where('user_id', $user->id)->first();
+
+        if (!$document) {
+            return response()->json(['message' => 'Document not found or unauthorized.'], 404);
+        }
+
+        try {
+            $document->status = 'pending';
+            $document->save();
+
+            return response()->json(['message' => 'Document sent successfully.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to send document.'], 500);
+        }
+    }
 }
 

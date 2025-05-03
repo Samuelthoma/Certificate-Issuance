@@ -4,6 +4,7 @@ import { openTypedModal, openDrawnModal, closeTypedModal, closeDrawnModal } from
 import { loadSignatureToCanvas, resetDrawCanvas, getHasDrawn, setHasDrawn } from './canvasDrawing.js';
 import { drawnSignatures, storeSignature } from './signatureStorage.js';
 import { updateBoxUserId as updateBoxInManager } from './signatureBoxManager.js';
+import { getPermissions } from '../document/documentPermissions.js';
 
 // Track which box is currently being edited
 let currentBoxId = null;

@@ -124,10 +124,23 @@
                 <i class="fas fa-paper-plane mr-2"></i>Send Document
             </button>
 
-            <label class="font-bold">Finalize</label>
-            <button id="finalize-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
-                <i class="fas fa-check-circle mr-2"></i>Finalize Document
-            </button>
+            <div id="finalize-btn-container">
+                <label class="font-bold">Finalize</label>
+                <button id="finalize-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                    <i class="fas fa-check-circle mr-2"></i>Finalize Document
+                </button>
+            </div>
+
+            <label class="font-bold">Response</label>
+            <div class="flex gap-2.5 my-4">
+                <div id="send-btn" class="flex w-1/2 bg-white hover:bg-gray-200 border-2 py-2 font-semibold items-center justify-center">
+                    <i class="fas fa-pen-nib mr-2"></i>Sign Document
+                </div>
+
+                <div id="reject-btn" class="flex w-1/2 bg-red-300 hover:bg-red-400 border-2 py-2 font-semibold items-center justify-center">
+                    <i class="fas fa-ban mr-2"></i>Reject Document
+                </div>
+            </div>
         </div>
 
         <div class="w-1/2 py-4 overflow-auto h-full">

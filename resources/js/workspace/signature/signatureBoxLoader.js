@@ -96,7 +96,7 @@ export function loadBoxesForCurrentPage() {
       box.appendChild(statusIndicator);
       
       // Add resize handles
-      if(permissions.canResizeSignature){
+      if(permissions.canModifySignatureFields){
         addResizeHandles(box);
       }
       
@@ -111,7 +111,7 @@ export function loadBoxesForCurrentPage() {
       box.appendChild(deleteBtn);
       
       // Add event listeners for dragging
-      if (permissions.canMoveSignature) {
+      if (permissions.canModifySignatureFields) {
         makeDraggable(box);
       }
       

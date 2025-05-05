@@ -15,9 +15,6 @@ let documentPermissions = {
   canSign: false,
   canFinalizeDocument: false,
   canRejectSignature: false,
-  canMoveSignature: false,
-  canResizeSignature: false,
-  canAssignSignature: false,
   
   // Document state control
   canRevokeDocument: false,
@@ -44,12 +41,6 @@ function initializePermissions(status, isOwner) {
         documentPermissions.canAddCollaborators = true;
         documentPermissions.canSaveDraft = true;
         documentPermissions.canSendDocument = true;
-        documentPermissions.canMoveSignature = true;
-        documentPermissions.canResizeSignature= true;
-        documentPermissions.canAssignSignature= true;
-        documentPermissions.canRejectDocument = false;
-      }else{
-        documentPermissions.canRejectDocument = false;
       }
       // If not owner and draft: View only (all permissions remain false)
       break;
@@ -59,11 +50,6 @@ function initializePermissions(status, isOwner) {
         documentPermissions.canFinalizeDocument = true;
         documentPermissions.canRejectSignature = true;
         documentPermissions.canSign = true;
-
-        documentPermissions.canModifySignatureFields = false;
-        documentPermissions.canMoveSignature = false;
-        documentPermissions.canResizeSignature = false;
-        documentPermissions.canRejectDocument = false;
       } else {
         documentPermissions.canSign = true;
       }

@@ -134,7 +134,8 @@ function collectSignatureData() {
 async function saveSignaturesToServer(data) {
   // Get CSRF token from meta tag
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  
+  const token = sessionStorage.getItem("token");
+
   if (!csrfToken) {
     console.warn('CSRF token not found. Add a meta tag with name="csrf-token"');
   }
@@ -142,6 +143,7 @@ async function saveSignaturesToServer(data) {
   const response = await fetch('/api/signatures/save-draft', {
     method: 'POST',
     headers: {
+      "Authorization": `Bearer ${token}`,
       'Content-Type': 'application/json',
       'X-CSRF-TOKEN': csrfToken || '',
       'Accept': 'application/json'

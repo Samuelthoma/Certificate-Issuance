@@ -44,7 +44,7 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
   box.appendChild(statusIndicator);
   
   // Add resize handles
-  if(permissions.canResizeSignature){
+  if(permissions.canModifySignatureFields){
     addResizeHandles(box);
   }
   
@@ -61,7 +61,7 @@ export function createSignatureBox(type, left, top, width, height, targetUserId 
   }
 
   // Add event listeners for dragging
-  if (permissions.canMoveSignature) {
+  if (permissions.canModifySignatureFields) {
     makeDraggable(box);
   }
   

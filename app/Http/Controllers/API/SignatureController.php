@@ -6,15 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Signature;
 use App\Models\SigningRequest;
+use App\Models\SignatureNonce;
+use App\Models\Certificate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SignatureController extends Controller
 {
     /**
      * Save signature draft data
+     * Includes security checks for document status, ownership, and content integrity
      * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -46,28 +50,83 @@ class SignatureController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-            
             $documentId = $request->input('document_id');
             $userId = $request->input('user_id');
+            
+            // Get the authenticated user ID
+            $authenticatedUserId = Auth::user()->id;
+            
+            // Verify the authenticated user matches the requested user_id
+            if ($authenticatedUserId != $userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access attempt detected'
+                ], 403);
+            }
+            
+            // Fetch the document with status check
+            $document = Document::find($documentId);
+            
+            // Check if document exists
+            if (!$document) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Document not found'
+                ], 404);
+            }
+            
+            // Check document ownership
+            if ($document->user_id != $authenticatedUserId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to modify this document'
+                ], 403);
+            }
+            
+            // Check document status
+            if ($document->status !== 'draft') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "This document is no longer in draft status. Current status: {$document->status}"
+                ], 403);
+            }
+            
+            DB::beginTransaction();
+            
             $signatures = $request->input('signatures');
             $existingIds = $request->input('existing_ids', []);
             
-            // Check document ownership
-            $document = Document::find($documentId);
-            $isDocumentOwner = $document && $document->user_id == $userId;
+            // Get existing signatures for content preservation check
+            $existingSignatures = Signature::where('document_id', $documentId)
+                ->whereIn('id', array_filter(array_column($signatures, 'id')))
+                ->get()
+                ->keyBy('id');
             
             // Process each signature
             foreach ($signatures as $signatureData) {
-                // Ensure content is set, even if empty
-                $content = $signatureData['content'] ?? '';
-                
                 // Check if this is an update (has ID) or create (no ID)
                 if (!empty($signatureData['id'])) {
                     // Update existing signature
                     $signature = Signature::find($signatureData['id']);
                     
                     if ($signature) {
+                        // Security check: Preserve original content
+                        $content = $signature->content;
+                        
+                        // Check for potential content tampering
+                        if (isset($signatureData['content']) && $signatureData['content'] !== $content) {
+                            DB::rollBack();
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Content modification detected - operation aborted'
+                            ], 403);
+                        }
+                        
+                        // Ensure status is 'pending' during draft updates
+                        if ($signatureData['status'] !== 'pending') {
+                            $signatureData['status'] = 'pending';
+                        }
+                        
                         $signature->update([
                             'page' => $signatureData['page'],
                             'rel_x' => $signatureData['rel_x'],
@@ -75,13 +134,15 @@ class SignatureController extends Controller
                             'rel_width' => $signatureData['rel_width'],
                             'rel_height' => $signatureData['rel_height'],
                             'type' => $signatureData['type'],
-                            'content' => $content,
                             'status' => $signatureData['status'],
-                            'user_id' => $signatureData['user_id']
+                            'user_id' => $signatureData['user_id'],
+                            // Content is preserved from original
+                            'content' => $content
                         ]);
                     }
                 } else {
                     // Create new signature
+                    // For new signatures, content should be empty in draft mode
                     $signature = Signature::create([
                         'document_id' => $documentId,
                         'user_id' => $signatureData['user_id'],
@@ -91,8 +152,8 @@ class SignatureController extends Controller
                         'rel_width' => $signatureData['rel_width'],
                         'rel_height' => $signatureData['rel_height'],
                         'type' => $signatureData['type'],
-                        'content' => $content,
-                        'status' => $signatureData['status']
+                        'content' => '', // Always empty for new signatures in draft
+                        'status' => 'pending' // Always pending in draft
                     ]);
                     
                     $existingIds[] = $signature->id; 
@@ -115,7 +176,7 @@ class SignatureController extends Controller
             }
             
             // Delete signatures that no longer exist (only if user is document owner)
-            if ($isDocumentOwner && !empty($existingIds)) {
+            if (!empty($existingIds)) {
                 // Get all signature IDs for this document
                 $allDocSignatureIds = Signature::where('document_id', $documentId)->pluck('id')->toArray();
                 

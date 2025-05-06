@@ -8,7 +8,7 @@ import { initializePermissions } from './documentPermissions.js';
 import { initPermissionsUI } from './permissionsUI.js';
 import saveDraftHandler from './saveDraft.js';
 import { sendDocument } from './sendDocument.js';
-import signDocument from './signDocument.js';
+// import signDocument from './signDocument.js';
 
 async function initializeDocument() {
   try {
@@ -29,7 +29,7 @@ async function initializeDocument() {
     
     // Initialize permission-based UI
     initPermissionsUI();
-    signDocument.init();
+    // signDocument.init();
     
     // Initialize save draft functionality
     saveDraftHandler.init();

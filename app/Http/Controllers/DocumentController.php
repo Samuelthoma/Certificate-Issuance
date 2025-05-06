@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\CollaboratorAdded;
 
 
 class DocumentController extends Controller
@@ -248,7 +249,8 @@ class DocumentController extends Controller
 
         $user = Auth::user();
 
-        $document = Document::findOrFail($id);
+        $document = Document::with('user')
+                    ->findOrFail($id);
         if($user->id !== $document->user_id){
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -306,6 +308,9 @@ class DocumentController extends Controller
             'user_id' => $recipient->id,
             'encrypted_aes_key' => $encryptred_dek,
         ]);
+
+        $recipient->notify(new CollaboratorAdded($document->file_name, $document->user->email));
+
         return response()->json(['message' => 'Collaborator added successfully']);
         // End Encrypt DEK with recipient's public key
     }

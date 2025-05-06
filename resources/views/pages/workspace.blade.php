@@ -121,10 +121,13 @@
                 </button>
             </div>
             
-            <label class="font-bold">Send</label>
-            <button id="send-document-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
-                <i class="fas fa-paper-plane mr-2"></i>Send Document
-            </button>
+            <div id="send-btn-container">
+                <label class="font-bold">Send</label>
+                <button id="send-document-btn" class="w-full bg-white hover:bg-gray-200 border-2 font-semibold py-2 px-4 my-4">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Document
+                </button>
+            </div>
+            
 
             <div id="finalize-btn-container">
                 <label class="font-bold">Finalize</label>

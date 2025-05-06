@@ -52,6 +52,7 @@ function initializePermissions(status, isOwner) {
         documentPermissions.canSign = true;
       } else {
         documentPermissions.canSign = true;
+        documentPermissions.canRejectDocument = true;
       }
       break;
       

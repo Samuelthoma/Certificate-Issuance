@@ -166,8 +166,13 @@ function updatePendingUI(permissions) {
     }
   });
 
+  const sendBtn = document.getElementById('send-btn-container');
+  if (sendBtn) {
+    sendBtn.style.display = 'none';
+  } 
+
   const signButton = document.getElementById('sign-btn');
-  if (signButton) {
+  if (signButton && !permissions.canRejectDocument) {
     signButton.disabled = !permissions.canSign;
     signButton.classList.toggle('opacity-50', !permissions.canSign);
     signButton.classList.toggle('cursor-not-allowed', !permissions.canSign);
@@ -178,6 +183,7 @@ function updatePendingUI(permissions) {
   const rejectButton = document.getElementById('reject-btn');
   if (rejectButton) {
     rejectButton.style.display = permissions.canRejectDocument ? 'block' : 'none';
+    rejectButton.classList.add('w-1/2');
   }
 }
 

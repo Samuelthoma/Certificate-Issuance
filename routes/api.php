@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\DocumentSigningController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\NikVerificationController;
 use App\Http\Controllers\API\FaceVerificationController;
@@ -53,3 +54,6 @@ Route::middleware('auth:api')->post('/documents/{id}/send', [DocumentController:
 
 Route::get('/signatures/{document_id}', [SignatureController::class, 'getSignatures']);
 
+Route::middleware('auth:api')->post('/signatures/initiate-signing', [DocumentSigningController::class, 'initiateSigningProcess']); 
+
+Route::middleware('auth:api')->post('/signatures/complete-signing', [DocumentSigningController::class, 'completeSigningProcess']);

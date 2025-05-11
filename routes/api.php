@@ -52,6 +52,8 @@ Route::middleware('auth:api')->post('/signatures/save-draft', [SignatureControll
 
 Route::middleware('auth:api')->post('/documents/{id}/send', [DocumentController::class, 'sendDocument']);
 
+Route::middleware('auth:api')->get('/documents/collaborating', [DocumentController::class, 'getCollaboratorDocuments']);
+
 Route::get('/signatures/{document_id}', [SignatureController::class, 'getSignatures']);
 
 Route::middleware('auth:api')->post('/signatures/initiate-signing', [DocumentSigningController::class, 'initiateSigningProcess']); 

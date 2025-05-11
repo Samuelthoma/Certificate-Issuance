@@ -298,6 +298,21 @@ public function get(Request $request, $id)
         return response()->json(['collaborators' => $collaborators->values()]);
     }
 
+    public function getCollaboratorDocuments()
+    {
+        $userId = Auth::id();
+
+        $documents = Document::whereHas('accessList', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('user_id', '!=', $userId)
+            ->get();
+
+        return response()->json(['documents' => $documents]);
+    }
+
+
+
     public function sendDocument($id){
         $user = Auth::user();
         $document = Document::where('id', $id)->where('user_id', $user->id)->first();

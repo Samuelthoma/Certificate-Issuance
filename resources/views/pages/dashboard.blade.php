@@ -1,4 +1,6 @@
-@extends('layouts.dashboard') @section('content')
+@extends('layouts.dashboard') 
+@vite(['resources/js/dashboard/index.js'])
+@section('content')
 <div class="flex justify-between items-center mb-8">
     <button class="md:hidden text-gray-500" onclick="toggleSidebar()">
         <i class="fas fa-bars text-xl"></i>

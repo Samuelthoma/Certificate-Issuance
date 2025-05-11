@@ -9,6 +9,7 @@ use App\Http\Middleware\VerifiedRegistrationMiddleware;
 use App\Http\Controllers\API\FaceVerificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RegistrationStepController;
+use App\Http\Controllers\SharedController;
 use Illuminate\Support\Facades\Auth;
 
 //Login and Registration Routes
@@ -35,6 +36,9 @@ Route::post('/complete-registration', [RegistrationController::class, 'completeR
 
 // Dashboard Routes
 Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
+
+//Shared With Me Routes
+Route::get('/shared-with-me', [SharedController::class, 'showSharedWithMe'])->name('shared-with-me');
 
 //Workspace Routes
 Route::get('/workspace/{id}', function ($id) {

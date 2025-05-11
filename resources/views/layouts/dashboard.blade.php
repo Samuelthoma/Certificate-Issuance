@@ -13,7 +13,7 @@
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/css/app.css', 'resources/js/dashboard/index.js'])
+    @vite(['resources/css/app.css'])
 </head>
     
 <body class="bg-gray-100 font-sans h-screen overflow-hidden">
@@ -34,7 +34,7 @@
             </p>
 
             <nav class="space-y-3 px-4 pb-4">
-                <a class="flex items-center text-black p-3 hover:bg-gray-300 hover:rounded-md font-semibold" href="#">
+                <a class="flex items-center text-black p-3 hover:bg-gray-300 hover:rounded-md font-semibold" href="/dashboard">
                     <i class="fas fa-th mr-2 w-5 text-center"></i>
                     Dashboard
                 </a>
@@ -63,6 +63,11 @@
                 <a class="flex items-center text-black p-3 hover:bg-gray-300 hover:rounded-md font-semibold" href="#">
                     <i class="fas fa-file-alt mr-2 w-5 text-center"></i>
                     Reports
+                </a>
+
+                <a class="flex items-center text-black p-3 hover:bg-gray-300 hover:rounded-md font-semibold" href="/shared-with-me">
+                    <i class="fas fa-users mr-2 w-5 text-center"></i>
+                    Shared With Me
                 </a>
                 <a id="logoutButton" class="flex items-center text-red-500 p-3 hover:bg-red-100 hover:rounded-md font-semibold cursor-pointer">
                     <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i>

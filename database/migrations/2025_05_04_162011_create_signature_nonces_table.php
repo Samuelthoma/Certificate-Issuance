@@ -20,6 +20,7 @@ class CreateSignatureNoncesTable extends Migration
             $table->timestamp('signed_at')->nullable();
             $table->enum('status', ['pending', 'used', 'expired', 'revoked'])->default('pending');
             $table->ipAddress('ip_address')->nullable();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('document_id')->references('id')->on('documents')->onDelete('cascade');

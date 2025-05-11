@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('signature_id');
             $table->enum('status', ['pending', 'completed', 'declined'])->default('pending');
             $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             $table->foreign('document_id')->references('id')->on('documents')->cascadeOnDelete();
             $table->foreign('requester_id')->references('id')->on('users')->cascadeOnDelete();

@@ -117,7 +117,7 @@ with open(input_pdf_path, "rb+") as doc_stream:
     pdf_signer = PdfSigner(
         signature_meta=PdfSignatureMetadata(field_name=field_name),
         signer=signer,
-        stamp_style=stamp_style
+        stamp_style=stamp_style,
     )
 
     with open(output_pdf_path, "wb") as outf:

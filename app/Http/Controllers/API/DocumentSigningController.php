@@ -12,13 +12,24 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use App\Services\DocumentEncryptionService;
 
 class DocumentSigningController extends Controller
 {
+    protected $encryptionService;
+
+    /**
+     * Constructor
+     *
+     * @param DocumentEncryptionService $encryptionService
+     */
+    public function __construct(DocumentEncryptionService $encryptionService)
+    {
+        $this->encryptionService = $encryptionService;
+    }
+
     /**
      * Initiate the document signing process
      * Creates a nonce and prepares the document for signing
@@ -68,14 +79,13 @@ class DocumentSigningController extends Controller
             if ($document->user_id == $userId) {
                 $hasPermission = true;
             } 
-            // Check if user has access to the document
+            // Check if user has signature fields assigned to them in this document
             else {
-                $hasAccess = $document->accessList()
+                $hasSignatureField = Signature::where('document_id', $documentId)
                     ->where('user_id', $userId)
-                    ->where('permission', 'sign')
                     ->exists();
                     
-                if ($hasAccess) {
+                if ($hasSignatureField) {
                     $hasPermission = true;
                 }
             }
@@ -125,7 +135,7 @@ class DocumentSigningController extends Controller
                 ], 404);
             }
             
-            // Create a nonce for this signing session
+            // Create a nonce for this signing process
             $nonce = Str::random(32);
             $expiresAt = now()->addMinutes(30);
             
@@ -163,7 +173,7 @@ class DocumentSigningController extends Controller
         }
     }
     
-    /**
+ /**
      * Complete the document signing process
      * Applies the signature to the document
      * 
@@ -181,7 +191,7 @@ class DocumentSigningController extends Controller
             'signature_boxes.*.db_id' => 'required|exists:signatures,id',
             'signature_boxes.*.content' => 'required|string',
             'document_data' => 'required|string',
-            'private_key' => 'required|string'  // Add private key validation
+            'private_key' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -199,11 +209,11 @@ class DocumentSigningController extends Controller
             $nonce = $request->input('nonce');
             $signature = $request->input('signature');
             $signatureBoxes = $request->input('signature_boxes');
-            $privateKey = $request->input('private_key');  // Get private key from request
+            $privateKey = $request->input('private_key');
             $userId = Auth::user()->id;
     
-                // Verify the nonce
-                $nonceEntry = SignatureNonce::where('nonce', $nonce)
+            // Verify the nonce
+            $nonceEntry = SignatureNonce::where('nonce', $nonce)
                 ->where('document_id', $documentId)
                 ->where('user_id', $userId)
                 ->where('used', false)
@@ -242,7 +252,6 @@ class DocumentSigningController extends Controller
             }
             
             // Ensure we have the base64 data of the document from the request
-            // The client already has the decrypted version of the document
             $base64DocumentData = $request->input('document_data');
             
             if (!$base64DocumentData) {
@@ -266,44 +275,89 @@ class DocumentSigningController extends Controller
             
             file_put_contents($tempFilePath, $binaryData);
             
-            // When calling applySignature, pass the private key
+            // Call the signing API
             $signedFilePath = $this->applySignature(
                 $tempFilePath, 
                 $certificate, 
                 $signatureBoxes, 
                 $signature,
-                $privateKey  // Pass private key to the method
+                $privateKey  
             );
             
-            // Rest of the method remains the same...
+            if (!$signedFilePath) {
+                // Clean up temp file
+                @unlink($tempFilePath);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to apply signature to document'
+                ], 500);
+            }
+            
+            // Read the signed document
+            $signedDocument = file_get_contents($signedFilePath);
+            
+            // Clean up temp files
+            @unlink($tempFilePath);
+            @unlink($signedFilePath);
+            Log::debug('Signed document binary size: ' . strlen($signedDocument));
+
+            $encryptedSignedDocument = $this->encryptionService->reEncryptWithExistingKeys(
+                $signedDocument, 
+                $document, 
+                $privateKey
+            );
+
+            if ($encryptedSignedDocument === false) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to encrypt signed document'
+                ], 500);
+            }
+            
+            // Update the document with the signed version
+            $this->encryptionService->updateDocument($document, $encryptedSignedDocument);
+            
+            // Update signature status
+            $dbIds = array_column($signatureBoxes, 'db_id');
+            Signature::whereIn('id', $dbIds)->update([
+                'status' => 'active'
+            ]);
+            
+            // Mark nonce as used
+            $nonceEntry->update([
+                'used' => true,
+                'signed_at' => now(),
+                'status' => 'used'
+            ]);
+            
+            // Update signature boxes with content
+            foreach ($signatureBoxes as $boxData) {
+                $signature = Signature::find($boxData['db_id']);
+                if ($signature) {
+                    $signature->update([
+                        'content' => $boxData['content']
+                    ]);
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Document signed successfully',
+                'redirect_url' => '/dashboard'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error completing signing process: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while completing the signing process',
+                'error' => $e->getMessage()
+            ], 500);
         }
-        catch (\Exception $e) {
-            // Exception handling remains the same...
-        }
-    }
-    
-    /**
-     * Encrypt the document using AES
-     * 
-     * @param string $data
-     * @param string $iv
-     * @return string
-     */
-    private function encryptDocument($data, $iv)
-    {
-        // Get the encryption key
-        $key = env('APP_KEY');
-        
-        // Encrypt the data
-        $encryptedData = openssl_encrypt(
-            $data,
-            'aes-256-cbc',
-            $key,
-            0,
-            $iv
-        );
-        
-        return $encryptedData;
     }
     
     /**
@@ -355,49 +409,31 @@ class DocumentSigningController extends Controller
             // Create output path
             $outputPath = $tempDir . '\\signed.pdf';
             
-            // Path to the Python script (already existing in the project)
-            $pythonScript = base_path('app\\Python\\documentsigning\\apply_signature.py');
-        
-            // Ensure the Python script directory exists
-            $scriptDir = dirname($pythonScript);
-            if (!file_exists($scriptDir)) {
-                mkdir($scriptDir, 0777, true);
-            }
-            
-            // Build the command
-            $command = [
-                'python',
-                $pythonScript,
-                $tempPdfPath,
-                $certPath,
-                $signaturePath,
-                $boxesJsonPath,
-                $outputPath
-            ];
-            
-            // Add the private key path if available
-            if ($keyPath) {
-                $command[] = $keyPath;
-            }
-            
-            Log::debug($command);
-            // Run the command
-            $process = new Process($command);
-            $process->setTimeout(180); // 3 minutes
-            $process->run();
-            
-            // Check if the process was successful
-            if (!$process->isSuccessful()) {
-                Log::error('Python script failed: ' . $process->getErrorOutput());
-                throw new ProcessFailedException($process);
-            }
-            
-            // Check if the output file exists
-            if (!file_exists($outputPath)) {
-                Log::error('Output file not created');
+            // Prepare the POST request to Flask API
+            $response = Http::attach(
+                'document', file_get_contents($tempPdfPath), 'document.pdf'
+            )->attach(
+                'certificate', file_get_contents($certPath), 'certificate.pem'
+            )->attach(
+                'signature_data', file_get_contents($signaturePath), 'signature.dat'
+            )->attach(
+                'signature_box', file_get_contents($boxesJsonPath), 'boxes.json'
+            )->attach(
+                'private_key', file_get_contents($keyPath), 'private_key.pem'
+            )->post('http://127.0.0.1:5001/sign');
+
+            // Check if the response is OK
+            if (!$response->ok()) {
+                Log::error('Flask signer API error: ' . $response->body());
                 return null;
             }
-            
+
+            // Save the signed PDF returned by the Flask API
+            file_put_contents($outputPath, $response->body());
+            if (file_put_contents($outputPath, $response->body()) === false) {
+                Log::error('Failed to save the signed PDF to ' . $outputPath);
+            }
+
             // Return the path to the signed PDF
             return $outputPath;
         } catch (\Exception $e) {

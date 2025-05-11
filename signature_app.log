@@ -1,0 +1,20 @@
+2025-05-06 23:41:17,286 - INFO - Starting to apply signature to C:\\Laravel\\Certificate-Issuance\\storage\\app\\temp\\681a392af3475\\document.pdf
+2025-05-06 23:41:17,343 - ERROR - Error processing box 1: 'NoneType' object is not subscriptable
+2025-05-06 23:41:17,343 - ERROR - Error processing box 2: 'NoneType' object is not subscriptable
+2025-05-06 23:41:17,344 - ERROR - Error signing PDF: cannot access local variable 'signature_meta' where it is not associated with a value
+2025-05-06 23:44:13,512 - INFO - Starting to apply signature to C:\\Laravel\\Certificate-Issuance\\storage\\app\\temp\\681a392af3475\\document.pdf
+2025-05-06 23:44:13,559 - ERROR - Error processing box 1: 'PdfFileReader' object has no attribute 'get_page'
+2025-05-06 23:44:13,559 - ERROR - Error processing box 2: 'PdfFileReader' object has no attribute 'get_page'
+2025-05-06 23:44:13,559 - ERROR - Error signing PDF: cannot access local variable 'signature_meta' where it is not associated with a value
+2025-05-06 23:50:26,363 - INFO - Starting to apply signature to C:\\Laravel\\Certificate-Issuance\\storage\\app\\temp\\681a392af3475\\document.pdf
+2025-05-06 23:50:26,403 - ERROR - Error processing box 1: 'PdfFileReader' object has no attribute 'get_page'
+2025-05-06 23:50:26,403 - ERROR - Error processing box 2: 'PdfFileReader' object has no attribute 'get_page'
+2025-05-06 23:50:26,405 - ERROR - Error writing output file: 'IncrementalPdfFileWriter' object has no attribute 'getbuffer'
+2025-05-06 23:54:42,076 - INFO - Starting to apply signature to C:\\Laravel\\Certificate-Issuance\\storage\\app\\temp\\681a392af3475\\document.pdf
+2025-05-06 23:54:42,114 - ERROR - Error processing box 1: 'NoneType' object is not subscriptable
+2025-05-06 23:54:42,114 - ERROR - Error processing box 2: 'NoneType' object is not subscriptable
+2025-05-06 23:54:42,114 - ERROR - Error signing PDF: cannot access local variable 'signature_meta' where it is not associated with a value
+2025-05-07 00:02:57,866 - INFO - Starting to apply signature to C:\\Laravel\\Certificate-Issuance\\storage\\app\\temp\\681a392af3475\\document.pdf
+2025-05-07 00:02:57,949 - ERROR - Error processing box 1: type object 'SigSeedSubFilter' has no attribute 'PKCS7_DETACHED'
+2025-05-07 00:02:57,952 - ERROR - Error processing box 2: type object 'SigSeedSubFilter' has no attribute 'PKCS7_DETACHED'
+2025-05-07 00:02:57,953 - ERROR - No valid signature boxes were processed successfully

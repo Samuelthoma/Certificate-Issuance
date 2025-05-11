@@ -24,3 +24,5 @@ easyocr
 torch 
 torchvision 
 torchaudio
+pyhanko 
+pyhanko-certvalidator

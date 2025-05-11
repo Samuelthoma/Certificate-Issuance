@@ -32,6 +32,7 @@ function renderDocuments(documents) {
 
     if (documents.length > 0) {
         documentHeader.classList.remove("hidden");
+        document.getElementById("noDocument").classList.add("hidden");
     }
 
     documents.forEach(doc => {

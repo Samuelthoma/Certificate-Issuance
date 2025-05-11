@@ -15,5 +15,6 @@
 
 
 <div id="documentHeaderCollaborator" class="text-xl font-bold my-8 hidden">Shared Documents</div>
+<div id="noDocument" class="text-xl font-bold italic">You don't have any shared document yet</div>
 <div id="documentListCollaborator" class="space-y-4 mt-4"></div>
 @endsection

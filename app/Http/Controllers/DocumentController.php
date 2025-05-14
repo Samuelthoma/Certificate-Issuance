@@ -99,83 +99,78 @@ class DocumentController extends Controller
         ], 201);
     }
 
-    
-public function get(Request $request, $id)
-{
-    Log::debug('Raw content', ['raw' => $request->getContent()]);
+        public function get(Request $request, $id)
+    {
+        Log::debug('Raw content', ['raw' => $request->getContent()]);
 
-    $user = Auth::user();
-    $document = Document::with('user')
-                ->where('id', $id)
-                ->whereHas('accessList', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })
-                ->first();
+        $user = Auth::user();
+        $document = Document::with('user')
+                    ->where('id', $id)
+                    ->whereHas('accessList', function ($query) use ($user) {
+                        $query->where('user_id', $user->id);
+                    })
+                    ->first();
 
-    if (!$document) {
-        return response()->json(['error' => 'Document not found'], 404);
-    }
-
-    $documentAccess = DocumentAccess::where('document_id', $id)
-                        ->where('user_id', $user->id)
-                        ->first();
-                
-    Log::debug('Document retrieved successfully', ['id' => $id, 'file_name' => $document->file_name]);
-
-    try {
-        // Decrypt the document using the encryption service
-        // Note: The updated method now base64-encodes the result by default
-        $privateKeyRaw = $request->get('private_key');
-        $decryptedContent = $this->encryptionService->decryptDocument(
-            $document, 
-            $documentAccess->encrypted_aes_key, 
-            $privateKeyRaw,
-            true  // Explicitly set to true to ensure base64 encoding
-        );
-        
-        if ($decryptedContent === false) {
-            return response()->json(['error' => 'Failed to decrypt document'], 500);
+        if (!$document) {
+            return response()->json(['error' => 'Document not found'], 404);
         }
-        
-        Log::debug('Document decrypted successfully');
-        
-        // Create a temp directory if it doesn't exist
-        $tempPath = storage_path('app/temp');
-        if (!File::exists($tempPath)) {
-            File::makeDirectory($tempPath, 0755, true);
+
+        $documentAccess = DocumentAccess::where('document_id', $id)
+                            ->where('user_id', $user->id)
+                            ->first();
+                    
+        Log::debug('Document retrieved successfully', ['id' => $id, 'file_name' => $document->file_name]);
+
+        try {
+            // Decrypt the document using the encryption service
+            // Note: The updated method now base64-encodes the result by default
+            $privateKeyRaw = $request->get('private_key');
+            $decryptedContent = $this->encryptionService->decryptDocument(
+                $document, 
+                $documentAccess->encrypted_aes_key, 
+                $privateKeyRaw,
+                true 
+            );
+            
+            if ($decryptedContent === false) {
+                return response()->json(['error' => 'Failed to decrypt document'], 500);
+            }
+            
+            Log::debug('Document decrypted successfully');
+            
+            // Create a temp directory if it doesn't exist
+            $tempPath = storage_path('app/temp');
+            if (!File::exists($tempPath)) {
+                File::makeDirectory($tempPath, 0755, true);
+            }
+            
+            // Generate a unique filename for the temp file
+            $fileExtension = pathinfo($document->file_name, PATHINFO_EXTENSION);
+            $fileName = 'temp_' . $document->id . '_' . Str::random(8) . '.' . $fileExtension;
+            $filePath = $tempPath . '/' . $fileName;
+            
+            
+            Log::debug('Document saved to temp storage', ['temp_path' => $filePath]);
+            
+            // Return data with the temp file path
+            return response()->json([
+                'file_name' => $document->file_name,
+                'file_type' => $document->file_type,
+                'file_data' => $decryptedContent,  
+                'file_owner' => $document->user->email,
+                'file_id' => $document->id,
+                'isOwner' => $user->id === $document->user_id,
+                'status' => $document->status,
+                'temp_file_path' => $filePath
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Exception in document decryption', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
         }
-        
-        // Generate a unique filename for the temp file
-        $fileExtension = pathinfo($document->file_name, PATHINFO_EXTENSION);
-        $fileName = 'temp_' . $document->id . '_' . Str::random(8) . '.' . $fileExtension;
-        $filePath = $tempPath . '/' . $fileName;
-        
-        // Save the decrypted content to the temp file
-        // Base64 decode the content if it's base64 encoded
-        $fileContent = base64_decode($decryptedContent);
-        File::put($filePath, $fileContent);
-        
-        Log::debug('Document saved to temp storage', ['temp_path' => $filePath]);
-        
-        // Return data with the temp file path
-        return response()->json([
-            'file_name' => $document->file_name,
-            'file_type' => $document->file_type,
-            'file_data' => $decryptedContent,  // Still include the base64 encoded data
-            'file_owner' => $document->user->email,
-            'file_id' => $document->id,
-            'isOwner' => $user->id === $document->user_id,
-            'status' => $document->status,
-            'temp_file_path' => $filePath
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Exception in document decryption', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
     }
-}
 
     public function index()
     {
